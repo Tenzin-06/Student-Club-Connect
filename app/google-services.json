@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "85431620705",
+    "project_id": "student-club-connect",
+    "storage_bucket": "student-club-connect.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:85431620705:android:c8f8dae64b851bc611c620",
+        "android_client_info": {
+          "package_name": "com.studentclubconnect"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKTxnOqTsfg6N45NFffa86bg6598Kw7K4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
