@@ -1,4 +1,4 @@
-package com.example.studentclubconnect
+package com.studentclubconnect
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge

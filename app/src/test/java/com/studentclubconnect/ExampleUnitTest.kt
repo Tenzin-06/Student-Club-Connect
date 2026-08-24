@@ -1,4 +1,4 @@
-package com.example.studentclubconnect
+package com.studentclubconnect
 
 import org.junit.Test
 

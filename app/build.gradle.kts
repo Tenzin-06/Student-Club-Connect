@@ -3,13 +3,13 @@ plugins {
 }
 
 android {
-    namespace = "com.example.studentclubconnect"
+    namespace = "com.studentclubconnect"
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "com.example.studentclubconnect"
+        applicationId = "com.studentclubconnect"
         minSdk = 24
         targetSdk = 37
         versionCode = 1
