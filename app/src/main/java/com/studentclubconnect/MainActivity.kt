@@ -1,71 +1,49 @@
 package com.studentclubconnect
 
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.google.firebase.FirebaseApp
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.studentclubconnect.databinding.ActivityMainBinding
+import com.studentclubconnect.viewmodel.AuthViewModel
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMainBinding
+    private val viewModel: AuthViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Final safety check: if not logged in, go to Login
+        if (viewModel.getCurrentUser() == null) {
+            navigateToLogin()
+            return
+        }
+
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        initializeFirebase()
+        binding.btnLogout.setOnClickListener {
+            viewModel.signOut()
+            navigateToLogin()
+        }
     }
 
-    private fun initializeFirebase() {
-        try {
-            val firebaseApp = FirebaseApp.getInstance()
-
-            Log.d(
-                "FirebaseTest",
-                "Firebase initialized: ${firebaseApp.name}"
-            )
-
-            val auth = FirebaseAuth.getInstance()
-
-            Log.d(
-                "FirebaseTest",
-                "Authentication service initialized"
-            )
-
-            val db = FirebaseFirestore.getInstance()
-
-            Log.d(
-                "FirebaseTest",
-                "Firestore service initialized"
-            )
-
-            Toast.makeText(
-                this,
-                "Firebase connected successfully",
-                Toast.LENGTH_SHORT
-            ).show()
-
-        } catch (e: Exception) {
-            Log.e(
-                "FirebaseTest",
-                "Firebase initialization failed",
-                e
-            )
-
-            Toast.makeText(
-                this,
-                "Unable to connect to the server. Please try again.",
-                Toast.LENGTH_LONG
-            ).show()
-        }
+    private fun navigateToLogin() {
+        val intent = Intent(this, LoginActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
     }
 }
