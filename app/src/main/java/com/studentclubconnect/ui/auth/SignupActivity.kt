@@ -43,9 +43,11 @@ class SignupActivity : AppCompatActivity() {
     private fun setupListeners() {
         binding.btnSignup.setOnClickListener {
             if (validateFields()) {
+                val name = binding.etFullName.text.toString().trim()
+                val studentId = binding.etStudentId.text.toString().trim()
                 val email = binding.etEmail.text.toString().trim()
                 val password = binding.etPassword.text.toString().trim()
-                viewModel.signUp(email, password)
+                viewModel.signUp(email, name, studentId, password)
             }
         }
 
@@ -141,6 +143,7 @@ class SignupActivity : AppCompatActivity() {
     private fun handleError(message: String) {
         android.util.Log.d("SignupActivity", "Error received: $message")
         val userFriendlyMessage = when {
+            message.contains("Account created", true) -> message
             message.contains("email-already-in-use", true) || 
             message.contains("email-already-exists", true) ||
             message.contains("already in use", true) -> {
