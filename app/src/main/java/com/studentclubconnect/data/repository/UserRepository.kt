@@ -19,6 +19,19 @@ class UserRepository(private val firestore: FirebaseFirestore = FirebaseFirestor
         }
     }
 
+    suspend fun updateUserProfile(user: User): Result<Unit> {
+        return try {
+            firestore.collection("users")
+                .document(user.uid)
+                .set(user)
+                .await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            android.util.Log.e("UserRepository", "Failed to update user profile", e)
+            Result.failure(e)
+        }
+    }
+
     suspend fun getUserProfile(uid: String): Result<User?> {
         return try {
             val document = firestore.collection("users")

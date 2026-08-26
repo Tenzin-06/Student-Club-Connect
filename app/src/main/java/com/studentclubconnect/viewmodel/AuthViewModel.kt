@@ -18,11 +18,10 @@ sealed class AuthState {
     data class Error(val message: String) : AuthState()
 }
 
-class AuthViewModel(
-    private val authRepository: AuthRepository = AuthRepository(),
-    private val userRepository: UserRepository = UserRepository()
-) : ViewModel() {
+class AuthViewModel : ViewModel() {
 
+    private val authRepository: AuthRepository = AuthRepository()
+    private val userRepository: UserRepository = UserRepository()
     private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
 

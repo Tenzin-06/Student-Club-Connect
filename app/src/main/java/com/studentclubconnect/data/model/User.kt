@@ -10,6 +10,8 @@ data class User(
     val programme: String = "",
     val department: String = "",
     val semester: Int = 0,
+    val phone: String = "",
+    val profileImage: String = "",
     val role: String = "student",
     @ServerTimestamp
     val createdAt: java.util.Date? = null
