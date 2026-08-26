@@ -3,7 +3,9 @@ package com.studentclubconnect.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
+import com.studentclubconnect.data.model.User
 import com.studentclubconnect.data.repository.AuthRepository
+import com.studentclubconnect.data.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,17 +18,20 @@ sealed class AuthState {
     data class Error(val message: String) : AuthState()
 }
 
-class AuthViewModel(private val repository: AuthRepository = AuthRepository()) : ViewModel() {
+class AuthViewModel(
+    private val authRepository: AuthRepository = AuthRepository(),
+    private val userRepository: UserRepository = UserRepository()
+) : ViewModel() {
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
 
-    fun getCurrentUser() = repository.getCurrentUser()
+    fun getCurrentUser() = authRepository.getCurrentUser()
 
     fun signIn(email: String, password: String) {
         viewModelScope.launch {
             _authState.value = AuthState.Loading
-            val result = repository.signIn(email, password)
+            val result = authRepository.signIn(email, password)
             result.fold(
                 onSuccess = { _authState.value = AuthState.Success(it) },
                 onFailure = { _authState.value = AuthState.Error(it.message ?: "Login failed") }
@@ -34,19 +39,45 @@ class AuthViewModel(private val repository: AuthRepository = AuthRepository()) :
         }
     }
 
-    fun signUp(email: String, password: String) {
+    fun signUp(email: String, name: String, studentId: String, password: String) {
         viewModelScope.launch {
             _authState.value = AuthState.Loading
-            val result = repository.signUp(email, password)
-            result.fold(
-                onSuccess = { _authState.value = AuthState.Success(it) },
-                onFailure = { _authState.value = AuthState.Error(it.message ?: "Signup failed") }
+            
+            // Step 1: Create Auth Account
+            val authResult = authRepository.signUp(email, password)
+            
+            authResult.fold(
+                onSuccess = { firebaseUser ->
+                    if (firebaseUser != null) {
+                        // Step 2: Create Firestore Profile
+                        val userProfile = User(
+                            uid = firebaseUser.uid,
+                            name = name,
+                            studentId = studentId,
+                            email = email
+                        )
+                        
+                        val firestoreResult = userRepository.createUserProfile(userProfile)
+                        
+                        firestoreResult.fold(
+                            onSuccess = { _authState.value = AuthState.Success(firebaseUser) },
+                            onFailure = { 
+                                _authState.value = AuthState.Error("Account created, but we couldn't save your profile. Please try again.") 
+                            }
+                        )
+                    } else {
+                        _authState.value = AuthState.Error("Signup failed: User is null")
+                    }
+                },
+                onFailure = { 
+                    _authState.value = AuthState.Error(it.message ?: "Signup failed") 
+                }
             )
         }
     }
 
     fun signOut() {
-        repository.signOut()
+        authRepository.signOut()
         _authState.value = AuthState.Idle
     }
     
