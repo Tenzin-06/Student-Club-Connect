@@ -40,8 +40,8 @@ class LoginActivity : AppCompatActivity() {
         }
 
         binding.btnCreateAccount.setOnClickListener {
-            // TODO: Navigate to Signup
-            Toast.makeText(this, "Navigate to Signup", Toast.LENGTH_SHORT).show()
+            val intent = android.content.Intent(this, com.studentclubconnect.ui.auth.SignupActivity::class.java)
+            startActivity(intent)
         }
     }
 
