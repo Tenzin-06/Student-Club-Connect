@@ -24,10 +24,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         
         // Final safety check: if not logged in, go to Login
-        if (authViewModel.getCurrentUser() == null) {
+        val user = authViewModel.getCurrentUser()
+        if (user == null) {
             navigateToLogin()
             return
         }
+        
+        // Load role/profile for RBAC
+        authViewModel.loadUserProfile(user.uid)
 
         enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)

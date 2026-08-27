@@ -38,6 +38,7 @@ class UserRepository(private val firestore: FirebaseFirestore = FirebaseFirestor
                 .document(uid)
                 .get()
                 .await()
+            
             Result.success(document.toObject(User::class.java))
         } catch (e: Exception) {
             android.util.Log.e("UserRepository", "Failed to get user profile", e)

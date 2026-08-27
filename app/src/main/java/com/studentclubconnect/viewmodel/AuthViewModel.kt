@@ -25,14 +25,32 @@ class AuthViewModel : ViewModel() {
     private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
 
+    private val _userProfile = MutableStateFlow<User?>(null)
+    val userProfile: StateFlow<User?> = _userProfile.asStateFlow()
+
     fun getCurrentUser() = authRepository.getCurrentUser()
+
+    fun loadUserProfile(uid: String) {
+        viewModelScope.launch {
+            userRepository.getUserProfile(uid).onSuccess { user ->
+                _userProfile.value = user
+            }.onFailure {
+                android.util.Log.e("AuthViewModel", "Failed to load user profile", it)
+            }
+        }
+    }
 
     fun signIn(email: String, password: String) {
         viewModelScope.launch {
             _authState.value = AuthState.Loading
             val result = authRepository.signIn(email, password)
             result.fold(
-                onSuccess = { _authState.value = AuthState.Success(it) },
+                onSuccess = { firebaseUser ->
+                    if (firebaseUser != null) {
+                        loadUserProfile(firebaseUser.uid)
+                    }
+                    _authState.value = AuthState.Success(firebaseUser)
+                },
                 onFailure = { _authState.value = AuthState.Error(it.message ?: "Login failed") }
             )
         }
@@ -53,13 +71,17 @@ class AuthViewModel : ViewModel() {
                             uid = firebaseUser.uid,
                             name = name,
                             studentId = studentId,
-                            email = email
+                            email = email,
+                            role = "student" // Default role
                         )
                         
                         val firestoreResult = userRepository.createUserProfile(userProfile)
                         
                         firestoreResult.fold(
-                            onSuccess = { _authState.value = AuthState.Success(firebaseUser) },
+                            onSuccess = { 
+                                _userProfile.value = userProfile
+                                _authState.value = AuthState.Success(firebaseUser) 
+                            },
                             onFailure = { 
                                 _authState.value = AuthState.Error("Account created, but we couldn't save your profile. Please try again.") 
                             }
@@ -77,6 +99,7 @@ class AuthViewModel : ViewModel() {
 
     fun signOut() {
         authRepository.signOut()
+        _userProfile.value = null
         _authState.value = AuthState.Idle
     }
     

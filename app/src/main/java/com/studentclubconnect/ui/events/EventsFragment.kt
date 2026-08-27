@@ -8,12 +8,14 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.studentclubconnect.databinding.FragmentEventsBinding
+import com.studentclubconnect.viewmodel.AuthViewModel
 import com.studentclubconnect.viewmodel.EventState
 import com.studentclubconnect.viewmodel.EventViewModel
 import kotlinx.coroutines.launch
@@ -23,6 +25,7 @@ class EventsFragment : Fragment() {
     private var _binding: FragmentEventsBinding? = null
     private val binding get() = _binding!!
     private val viewModel: EventViewModel by viewModels()
+    private val authViewModel: AuthViewModel by activityViewModels()
     private lateinit var eventAdapter: EventAdapter
 
     override fun onCreateView(
@@ -45,6 +48,10 @@ class EventsFragment : Fragment() {
         binding.btnRetry.setOnClickListener {
             viewModel.getEvents()
         }
+
+        binding.fabAddEvent.setOnClickListener {
+            Toast.makeText(requireContext(), "Add Event coming soon for admins", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun setupRecyclerView() {
@@ -64,24 +71,33 @@ class EventsFragment : Fragment() {
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.eventState.collect { state ->
-                    when (state) {
-                        is EventState.Loading -> showLoading(true)
-                        is EventState.Success -> {
-                            showLoading(false)
-                            eventAdapter.submitList(state.events)
+                launch {
+                    viewModel.eventState.collect { state ->
+                        when (state) {
+                            is EventState.Loading -> showLoading(true)
+                            is EventState.Success -> {
+                                showLoading(false)
+                                eventAdapter.submitList(state.events)
+                            }
+                            is EventState.Empty -> {
+                                showLoading(false)
+                                eventAdapter.submitList(emptyList())
+                                binding.emptyState.isVisible = true
+                            }
+                            is EventState.Error -> {
+                                showLoading(false)
+                                binding.errorState.isVisible = true
+                                Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                            }
+                            else -> {}
                         }
-                        is EventState.Empty -> {
-                            showLoading(false)
-                            eventAdapter.submitList(emptyList())
-                            binding.emptyState.isVisible = true
-                        }
-                        is EventState.Error -> {
-                            showLoading(false)
-                            binding.errorState.isVisible = true
-                            Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
-                        }
-                        else -> {}
+                    }
+                }
+
+                launch {
+                    authViewModel.userProfile.collect { user ->
+                        val isAdmin = user?.role?.lowercase() == "admin"
+                        binding.fabAddEvent.isVisible = isAdmin
                     }
                 }
             }

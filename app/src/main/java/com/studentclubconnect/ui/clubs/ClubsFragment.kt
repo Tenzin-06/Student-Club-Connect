@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -16,6 +17,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.studentclubconnect.data.model.Club
 import com.studentclubconnect.databinding.FragmentClubsBinding
+import com.studentclubconnect.viewmodel.AuthViewModel
 import com.studentclubconnect.viewmodel.ClubState
 import com.studentclubconnect.viewmodel.ClubViewModel
 import kotlinx.coroutines.launch
@@ -25,6 +27,7 @@ class ClubsFragment : Fragment() {
     private var _binding: FragmentClubsBinding? = null
     private val binding get() = _binding!!
     private val viewModel: ClubViewModel by viewModels()
+    private val authViewModel: AuthViewModel by activityViewModels()
     private lateinit var clubAdapter: ClubAdapter
 
     private var allClubs: List<Club> = emptyList()
@@ -52,6 +55,10 @@ class ClubsFragment : Fragment() {
 
         binding.btnRetry.setOnClickListener {
             viewModel.getClubs()
+        }
+
+        binding.fabAddClub.setOnClickListener {
+            Toast.makeText(requireContext(), "Add Club coming soon for admins", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -95,26 +102,35 @@ class ClubsFragment : Fragment() {
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.clubState.collect { state ->
-                    when (state) {
-                        is ClubState.Loading -> showLoading(true)
-                        is ClubState.Success -> {
-                            showLoading(false)
-                            allClubs = state.clubs
-                            filterClubs()
+                launch {
+                    viewModel.clubState.collect { state ->
+                        when (state) {
+                            is ClubState.Loading -> showLoading(true)
+                            is ClubState.Success -> {
+                                showLoading(false)
+                                allClubs = state.clubs
+                                filterClubs()
+                            }
+                            is ClubState.Empty -> {
+                                showLoading(false)
+                                allClubs = emptyList()
+                                clubAdapter.submitList(emptyList())
+                                binding.emptyState.isVisible = true
+                            }
+                            is ClubState.Error -> {
+                                showLoading(false)
+                                binding.errorState.isVisible = true
+                                Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                            }
+                            else -> {}
                         }
-                        is ClubState.Empty -> {
-                            showLoading(false)
-                            allClubs = emptyList()
-                            clubAdapter.submitList(emptyList())
-                            binding.emptyState.isVisible = true
-                        }
-                        is ClubState.Error -> {
-                            showLoading(false)
-                            binding.errorState.isVisible = true
-                            Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
-                        }
-                        else -> {}
+                    }
+                }
+
+                launch {
+                    authViewModel.userProfile.collect { user ->
+                        val isAdmin = user?.role?.lowercase() == "admin"
+                        binding.fabAddClub.isVisible = isAdmin
                     }
                 }
             }
