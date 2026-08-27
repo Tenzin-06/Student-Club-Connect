@@ -1,16 +1,104 @@
 package com.studentclubconnect.ui.events
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import com.studentclubconnect.R
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.studentclubconnect.databinding.FragmentEventsBinding
+import com.studentclubconnect.viewmodel.EventState
+import com.studentclubconnect.viewmodel.EventViewModel
+import kotlinx.coroutines.launch
 
 class EventsFragment : Fragment() {
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val view = inflater.inflate(R.layout.fragment_placeholder, container, false)
-        view.findViewById<android.widget.TextView>(R.id.tvPlaceholder).text = "Events Screen"
-        return view
+
+    private var _binding: FragmentEventsBinding? = null
+    private val binding get() = _binding!!
+    private val viewModel: EventViewModel by viewModels()
+    private lateinit var eventAdapter: EventAdapter
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentEventsBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        
+        setupRecyclerView()
+        observeViewModel()
+        
+        viewModel.getEvents()
+
+        binding.btnRetry.setOnClickListener {
+            viewModel.getEvents()
+        }
+    }
+
+    private fun setupRecyclerView() {
+        eventAdapter = EventAdapter { event ->
+            val intent = Intent(requireContext(), EventDetailsActivity::class.java).apply {
+                putExtra("eventId", event.id)
+            }
+            startActivity(intent)
+        }
+        
+        binding.rvEvents.apply {
+            adapter = eventAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+        }
+    }
+
+    private fun observeViewModel() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.eventState.collect { state ->
+                    when (state) {
+                        is EventState.Loading -> showLoading(true)
+                        is EventState.Success -> {
+                            showLoading(false)
+                            eventAdapter.submitList(state.events)
+                        }
+                        is EventState.Empty -> {
+                            showLoading(false)
+                            eventAdapter.submitList(emptyList())
+                            binding.emptyState.isVisible = true
+                        }
+                        is EventState.Error -> {
+                            showLoading(false)
+                            binding.errorState.isVisible = true
+                            Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                        }
+                        else -> {}
+                    }
+                }
+            }
+        }
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        binding.progressBar.isVisible = isLoading
+        binding.rvEvents.isVisible = !isLoading && !binding.emptyState.isVisible
+        if (isLoading) {
+            binding.emptyState.isVisible = false
+            binding.errorState.isVisible = false
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
