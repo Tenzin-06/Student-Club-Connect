@@ -11,4 +11,5 @@
     <color name="text_secondary">#666666</color>
     <color name="border_light">#D6D9DE</color>
     <color name="input_background">#F1F3F5</color>
+    <color name="chip_background">#E9ECEF</color>
 </resources>

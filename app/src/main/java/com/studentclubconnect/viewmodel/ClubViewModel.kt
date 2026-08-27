@@ -47,8 +47,8 @@ class ClubViewModel : ViewModel() {
                         _clubState.value = ClubState.Success(clubs)
                     }
                 },
-                onFailure = { 
-                    _clubState.value = ClubState.Error("Unable to load clubs. Please try again.") 
+                onFailure = { error ->
+                    _clubState.value = ClubState.Error("Error: ${error.message ?: "Unable to load clubs. Please try again."}") 
                 }
             )
         }
