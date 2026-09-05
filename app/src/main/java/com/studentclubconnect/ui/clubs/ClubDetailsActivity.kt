@@ -3,12 +3,14 @@ package com.studentclubconnect.ui.clubs
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.studentclubconnect.databinding.ActivityClubDetailsBinding
+import com.studentclubconnect.viewmodel.AuthViewModel
 import com.studentclubconnect.viewmodel.ClubState
 import com.studentclubconnect.viewmodel.ClubViewModel
 import com.studentclubconnect.viewmodel.MembershipState
@@ -20,8 +22,10 @@ class ClubDetailsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityClubDetailsBinding
     private val viewModel: ClubViewModel by viewModels()
     private val membershipViewModel: MembershipViewModel by viewModels()
+    private val authViewModel: AuthViewModel by viewModels()
 
     private var isMember = false
+    private var currentClub: com.studentclubconnect.data.model.Club? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +44,7 @@ class ClubDetailsActivity : AppCompatActivity() {
         
         viewModel.getClubById(clubId)
         membershipViewModel.checkMembership(clubId)
+        authViewModel.getCurrentUser()?.uid?.let { authViewModel.loadUserProfile(it) }
 
         binding.btnJoinClub.setOnClickListener {
             if (isMember) {
@@ -47,6 +52,17 @@ class ClubDetailsActivity : AppCompatActivity() {
             } else {
                 membershipViewModel.joinClub(clubId)
             }
+        }
+
+        binding.btnEditClub.setOnClickListener {
+            val intent = android.content.Intent(this, AddEditClubActivity::class.java).apply {
+                putExtra("clubId", clubId)
+            }
+            startActivity(intent)
+        }
+
+        binding.btnDeleteClub.setOnClickListener {
+            showDeleteConfirmation(clubId)
         }
     }
 
@@ -67,10 +83,16 @@ class ClubDetailsActivity : AppCompatActivity() {
                         }
                         is ClubState.SingleSuccess -> {
                             binding.progressBar.isVisible = false
+                            currentClub = state.club
                             state.club?.let { displayClub(it) } ?: run {
                                 Toast.makeText(this@ClubDetailsActivity, "Club not found.", Toast.LENGTH_SHORT).show()
                                 finish()
                             }
+                        }
+                        is ClubState.ActionSuccess -> {
+                            binding.progressBar.isVisible = false
+                            Toast.makeText(this@ClubDetailsActivity, state.message, Toast.LENGTH_SHORT).show()
+                            finish()
                         }
                         is ClubState.Error -> {
                             binding.progressBar.isVisible = false
@@ -78,6 +100,15 @@ class ClubDetailsActivity : AppCompatActivity() {
                         }
                         else -> {}
                     }
+                }
+            }
+        }
+
+        // Observe User Role for Admin Actions
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                authViewModel.userProfile.collect { user ->
+                    binding.adminActionContainer.isVisible = user?.role?.lowercase() == "admin"
                 }
             }
         }
@@ -118,6 +149,17 @@ class ClubDetailsActivity : AppCompatActivity() {
 
     private fun updateJoinButtonUI(member: Boolean) {
         binding.btnJoinClub.text = if (member) "Leave Club" else "Join Club"
+    }
+
+    private fun showDeleteConfirmation(clubId: String) {
+        AlertDialog.Builder(this)
+            .setTitle("Delete Club")
+            .setMessage("Are you sure you want to delete this club?")
+            .setPositiveButton("Delete") { _, _ ->
+                viewModel.deleteClub(clubId)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun displayClub(club: com.studentclubconnect.data.model.Club) {

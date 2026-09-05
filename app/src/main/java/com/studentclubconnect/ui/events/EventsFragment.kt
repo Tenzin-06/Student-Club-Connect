@@ -50,8 +50,14 @@ class EventsFragment : Fragment() {
         }
 
         binding.fabAddEvent.setOnClickListener {
-            Toast.makeText(requireContext(), "Add Event coming soon for admins", Toast.LENGTH_SHORT).show()
+            val intent = android.content.Intent(requireContext(), AddEditEventActivity::class.java)
+            startActivity(intent)
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.getEvents()
     }
 
     private fun setupRecyclerView() {

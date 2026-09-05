@@ -50,16 +50,21 @@ class ClubsFragment : Fragment() {
         setupFilters()
         setupSearch()
         observeViewModel()
-        
-        viewModel.getClubs()
 
         binding.btnRetry.setOnClickListener {
             viewModel.getClubs()
         }
 
         binding.fabAddClub.setOnClickListener {
-            Toast.makeText(requireContext(), "Add Club coming soon for admins", Toast.LENGTH_SHORT).show()
+            val intent = android.content.Intent(requireContext(), AddEditClubActivity::class.java)
+            startActivity(intent)
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // Refresh the list every time the fragment becomes visible
+        viewModel.getClubs()
     }
 
     private fun setupRecyclerView() {
