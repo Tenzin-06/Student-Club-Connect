@@ -64,8 +64,10 @@ class ClubsFragment : Fragment() {
 
     private fun setupRecyclerView() {
         clubAdapter = ClubAdapter { club ->
-            // Prepare for navigation to ClubDetailsActivity
-            Toast.makeText(requireContext(), "Opening ${club.name}", Toast.LENGTH_SHORT).show()
+            val intent = android.content.Intent(requireContext(), ClubDetailsActivity::class.java).apply {
+                putExtra("clubId", club.id)
+            }
+            startActivity(intent)
         }
         
         binding.rvClubs.apply {
