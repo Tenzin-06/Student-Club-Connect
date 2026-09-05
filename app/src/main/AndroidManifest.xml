@@ -36,7 +36,15 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
+            android:name=".ui.events.AddEditEventActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".ui.clubs.ClubDetailsActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.clubs.AddEditClubActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
     </application>

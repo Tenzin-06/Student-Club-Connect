@@ -3,12 +3,14 @@ package com.studentclubconnect.ui.events
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.studentclubconnect.databinding.ActivityEventDetailsBinding
+import com.studentclubconnect.viewmodel.AuthViewModel
 import com.studentclubconnect.viewmodel.ClubState
 import com.studentclubconnect.viewmodel.ClubViewModel
 import com.studentclubconnect.viewmodel.EventState
@@ -20,6 +22,7 @@ class EventDetailsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityEventDetailsBinding
     private val eventViewModel: EventViewModel by viewModels()
     private val clubViewModel: ClubViewModel by viewModels()
+    private val authViewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,9 +37,21 @@ class EventDetailsActivity : AppCompatActivity() {
         }
 
         setupToolbar()
-        observeViewModels()
+        observeViewModels(eventId)
         
         eventViewModel.getEventById(eventId)
+        authViewModel.getCurrentUser()?.uid?.let { authViewModel.loadUserProfile(it) }
+
+        binding.btnEditEvent.setOnClickListener {
+            val intent = android.content.Intent(this, AddEditEventActivity::class.java).apply {
+                putExtra("eventId", eventId)
+            }
+            startActivity(intent)
+        }
+
+        binding.btnDeleteEvent.setOnClickListener {
+            showDeleteConfirmation(eventId)
+        }
     }
 
     private fun setupToolbar() {
@@ -45,7 +60,7 @@ class EventDetailsActivity : AppCompatActivity() {
         }
     }
 
-    private fun observeViewModels() {
+    private fun observeViewModels(eventId: String) {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 eventViewModel.eventState.collect { state ->
@@ -62,12 +77,26 @@ class EventDetailsActivity : AppCompatActivity() {
                                 finish()
                             }
                         }
+                        is EventState.ActionSuccess -> {
+                            binding.progressBar.isVisible = false
+                            Toast.makeText(this@EventDetailsActivity, state.message, Toast.LENGTH_SHORT).show()
+                            finish()
+                        }
                         is EventState.Error -> {
                             binding.progressBar.isVisible = false
                             Toast.makeText(this@EventDetailsActivity, state.message, Toast.LENGTH_SHORT).show()
                         }
                         else -> {}
                     }
+                }
+            }
+        }
+
+        // Observe User Role for Admin Actions
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                authViewModel.userProfile.collect { user ->
+                    binding.adminActionContainer.isVisible = user?.role?.lowercase() == "admin"
                 }
             }
         }
@@ -81,6 +110,17 @@ class EventDetailsActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun showDeleteConfirmation(eventId: String) {
+        AlertDialog.Builder(this)
+            .setTitle("Delete Event")
+            .setMessage("Are you sure you want to delete this event?")
+            .setPositiveButton("Delete") { _, _ ->
+                eventViewModel.deleteEvent(eventId)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun displayEventDetails(event: com.studentclubconnect.data.model.Event) {
