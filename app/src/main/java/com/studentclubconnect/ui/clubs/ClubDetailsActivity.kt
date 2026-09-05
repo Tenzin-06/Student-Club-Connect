@@ -11,12 +11,17 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.studentclubconnect.databinding.ActivityClubDetailsBinding
 import com.studentclubconnect.viewmodel.ClubState
 import com.studentclubconnect.viewmodel.ClubViewModel
+import com.studentclubconnect.viewmodel.MembershipState
+import com.studentclubconnect.viewmodel.MembershipViewModel
 import kotlinx.coroutines.launch
 
 class ClubDetailsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityClubDetailsBinding
     private val viewModel: ClubViewModel by viewModels()
+    private val membershipViewModel: MembershipViewModel by viewModels()
+
+    private var isMember = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,12 +36,17 @@ class ClubDetailsActivity : AppCompatActivity() {
         }
 
         setupToolbar()
-        observeViewModel()
+        observeViewModels(clubId)
         
         viewModel.getClubById(clubId)
+        membershipViewModel.checkMembership(clubId)
 
         binding.btnJoinClub.setOnClickListener {
-            Toast.makeText(this, "Join Club functionality coming soon.", Toast.LENGTH_SHORT).show()
+            if (isMember) {
+                membershipViewModel.leaveClub(clubId)
+            } else {
+                membershipViewModel.joinClub(clubId)
+            }
         }
     }
 
@@ -46,7 +56,8 @@ class ClubDetailsActivity : AppCompatActivity() {
         }
     }
 
-    private fun observeViewModel() {
+    private fun observeViewModels(clubId: String) {
+        // Observe Club Details
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.clubState.collect { state ->
@@ -65,13 +76,48 @@ class ClubDetailsActivity : AppCompatActivity() {
                             binding.progressBar.isVisible = false
                             Toast.makeText(this@ClubDetailsActivity, state.message, Toast.LENGTH_SHORT).show()
                         }
-                        else -> {
-                            // Handle other states if necessary
-                        }
+                        else -> {}
                     }
                 }
             }
         }
+
+        // Observe Membership Status
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                membershipViewModel.membershipState.collect { state ->
+                    when (state) {
+                        is MembershipState.Loading -> {
+                            binding.btnJoinClub.isEnabled = false
+                        }
+                        is MembershipState.Status -> {
+                            binding.btnJoinClub.isEnabled = true
+                            isMember = state.isMember
+                            updateJoinButtonUI(isMember)
+                        }
+                        is MembershipState.Success -> {
+                            binding.btnJoinClub.isEnabled = true
+                            isMember = state.isMember
+                            updateJoinButtonUI(isMember)
+                            Toast.makeText(this@ClubDetailsActivity, state.message, Toast.LENGTH_SHORT).show()
+                        }
+                        is MembershipState.Error -> {
+                            binding.btnJoinClub.isEnabled = true
+                            Toast.makeText(this@ClubDetailsActivity, state.message, Toast.LENGTH_SHORT).show()
+                        }
+                        is MembershipState.AuthExpired -> {
+                            Toast.makeText(this@ClubDetailsActivity, "Authentication expired. Please log in again.", Toast.LENGTH_LONG).show()
+                            // In a real app, redirect to login
+                        }
+                        else -> {}
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updateJoinButtonUI(member: Boolean) {
+        binding.btnJoinClub.text = if (member) "Leave Club" else "Join Club"
     }
 
     private fun displayClub(club: com.studentclubconnect.data.model.Club) {
