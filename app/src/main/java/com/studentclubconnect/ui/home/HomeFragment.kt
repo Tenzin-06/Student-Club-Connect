@@ -105,6 +105,12 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupListeners() {
+        binding.ivNotifications.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.nav_host_fragment, NotificationsFragment())
+                .addToBackStack(null)
+                .commit()
+        }
         binding.btnViewAllEvents.setOnClickListener {
             navigateToTab(R.id.nav_events)
         }
