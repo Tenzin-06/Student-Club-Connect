@@ -103,7 +103,8 @@ class EventsFragment : Fragment() {
                 launch {
                     authViewModel.userProfile.collect { user ->
                         val isAdmin = user?.role?.lowercase() == "admin"
-                        binding.fabAddEvent.isVisible = isAdmin
+                        val isPresident = user?.role?.lowercase() == "president"
+                        binding.fabAddEvent.isVisible = isAdmin || isPresident
                     }
                 }
             }

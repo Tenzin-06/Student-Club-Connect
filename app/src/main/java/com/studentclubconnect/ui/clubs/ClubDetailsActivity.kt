@@ -45,7 +45,11 @@ class ClubDetailsActivity : AppCompatActivity() {
 
         setupToolbar()
         setupAnnouncements()
+<<<<<<< HEAD
         observeViewModels()
+=======
+        observeViewModels(clubId)
+>>>>>>> feat/role-based-access
         
         viewModel.getClubById(clubId)
         membershipViewModel.checkMembership(clubId)
@@ -86,7 +90,11 @@ class ClubDetailsActivity : AppCompatActivity() {
         }
     }
 
+<<<<<<< HEAD
     private fun observeViewModels() {
+=======
+    private fun observeViewModels(clubId: String) {
+>>>>>>> feat/role-based-access
         // Observe Club Details
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -126,7 +134,13 @@ class ClubDetailsActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 authViewModel.userProfile.collect { user ->
+<<<<<<< HEAD
                     binding.adminActionContainer.isVisible = user?.role?.lowercase() == "admin"
+=======
+                    val isAdmin = user?.role?.lowercase() == "admin"
+                    val isPresident = user?.role?.lowercase() == "president" && user.presidentOf == clubId
+                    binding.adminActionContainer.isVisible = isAdmin || isPresident
+>>>>>>> feat/role-based-access
                 }
             }
         }
