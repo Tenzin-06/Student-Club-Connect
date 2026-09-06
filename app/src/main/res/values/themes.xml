@@ -5,6 +5,7 @@
         <item name="android:windowBackground">@color/background_light</item>
         <item name="android:statusBarColor">@color/background_light</item>
         <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">@color/background_light</item>
     </style>
 
     <style name="Theme.StudentClubConnect" parent="Base.Theme.StudentClubConnect" />
@@ -18,7 +19,8 @@
 
     <style name="Typography.SubHeading" parent="TextAppearance.Material3.TitleMedium">
         <item name="android:textColor">@color/text_main</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">18sp</item>
     </style>
 
     <style name="Typography.Body" parent="TextAppearance.Material3.BodyMedium">
@@ -29,6 +31,12 @@
     <style name="Typography.Label" parent="TextAppearance.Material3.LabelLarge">
         <item name="android:textColor">@color/text_main</item>
         <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Typography.Caption" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">12sp</item>
     </style>
 
     <style name="Typography.Button" parent="TextAppearance.Material3.LabelLarge">
@@ -40,10 +48,10 @@
     <!-- Component Styles -->
     <style name="Component.Input" parent="">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">56dp</item>
+        <item name="android:layout_height">@dimen/input_height</item>
         <item name="android:background">@drawable/bg_input_field</item>
-        <item name="android:paddingStart">16dp</item>
-        <item name="android:paddingEnd">16dp</item>
+        <item name="android:paddingStart">@dimen/spacing_medium</item>
+        <item name="android:paddingEnd">@dimen/spacing_medium</item>
         <item name="android:textColor">@color/text_main</item>
         <item name="android:textColorHint">@color/text_secondary</item>
         <item name="android:textSize">16sp</item>
@@ -51,7 +59,7 @@
 
     <style name="Component.Button.Primary" parent="">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">56dp</item>
+        <item name="android:layout_height">@dimen/button_height</item>
         <item name="android:background">@drawable/bg_button_primary</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:textStyle">bold</item>
@@ -67,28 +75,36 @@
         <item name="android:textColor">@color/primary_navy</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:padding">8dp</item>
+        <item name="android:padding">@dimen/spacing_small</item>
+    </style>
+
+    <style name="Component.Card" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">@dimen/card_radius</item>
+        <item name="cardElevation">0dp</item>
+        <item name="cardBackgroundColor">@color/surface_white</item>
+        <item name="strokeColor">@color/border_light</item>
+        <item name="strokeWidth">1dp</item>
     </style>
 
     <style name="ProfileInfoRow" parent="">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingTop">12dp</item>
-        <item name="android:paddingBottom">12dp</item>
+        <item name="android:paddingTop">@dimen/spacing_small</item>
+        <item name="android:paddingBottom">@dimen/spacing_small</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:orientation">horizontal</item>
     </style>
 
     <style name="ProfileInfoIcon" parent="">
-        <item name="android:layout_width">24dp</item>
-        <item name="android:layout_height">24dp</item>
-        <item name="android:layout_marginEnd">16dp</item>
+        <item name="android:layout_width">@dimen/icon_size_medium</item>
+        <item name="android:layout_height">@dimen/icon_size_medium</item>
+        <item name="android:layout_marginEnd">@dimen/spacing_medium</item>
     </style>
 
     <style name="ProfileListItem" parent="">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:padding">16dp</item>
+        <item name="android:padding">@dimen/spacing_medium</item>
         <item name="android:background">?attr/selectableItemBackground</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:orientation">horizontal</item>

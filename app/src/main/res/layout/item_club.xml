@@ -2,20 +2,16 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Component.Card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="20dp"
-    android:layout_marginVertical="8dp"
-    app:cardBackgroundColor="@color/surface_white"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="0dp"
-    app:strokeColor="@color/border_light"
-    app:strokeWidth="1dp">
+    android:layout_marginHorizontal="@dimen/screen_margin"
+    android:layout_marginVertical="@dimen/spacing_small">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="@dimen/spacing_medium">
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardIcon"
@@ -41,11 +37,10 @@
             style="@style/Typography.SubHeading"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginStart="@dimen/spacing_medium"
+            android:layout_marginEnd="@dimen/spacing_small"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/cardIcon"
             app:layout_constraintTop_toTopOf="@id/cardIcon"
@@ -53,13 +48,12 @@
 
         <TextView
             android:id="@+id/tvClubCategory"
-            style="@style/Typography.Body"
+            style="@style/Typography.Caption"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="@dimen/spacing_tiny"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="@id/tvClubName"
             app:layout_constraintStart_toStartOf="@id/tvClubName"
             app:layout_constraintTop_toBottomOf="@id/tvClubName"
@@ -70,7 +64,7 @@
             style="@style/Typography.Body"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/spacing_small"
             android:ellipsize="end"
             android:maxLines="2"
             app:layout_constraintEnd_toEndOf="parent"
@@ -82,7 +76,7 @@
             android:id="@+id/divider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/spacing_medium"
             android:background="@color/border_light"
             app:layout_constraintTop_toBottomOf="@id/tvClubDescription" />
 
@@ -91,16 +85,15 @@
             style="@style/Typography.Label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/spacing_medium"
             android:text="View Club"
             android:textColor="@color/primary_navy"
-            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/divider" />
 
         <ImageView
-            android:layout_width="16dp"
-            android:layout_height="16dp"
+            android:layout_width="@dimen/icon_size_small"
+            android:layout_height="@dimen/icon_size_small"
             android:src="@drawable/ic_chevron_right"
             app:layout_constraintBottom_toBottomOf="@id/tvViewClub"
             app:layout_constraintEnd_toEndOf="parent"

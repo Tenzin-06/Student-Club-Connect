@@ -2,20 +2,16 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Component.Card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="20dp"
-    android:layout_marginVertical="8dp"
-    app:cardBackgroundColor="@color/surface_white"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="0dp"
-    app:strokeColor="@color/border_light"
-    app:strokeWidth="1dp">
+    android:layout_marginHorizontal="@dimen/screen_margin"
+    android:layout_marginVertical="@dimen/spacing_small">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="@dimen/spacing_medium">
 
         <!-- Date Badge -->
         <com.google.android.material.card.MaterialCardView
@@ -59,10 +55,9 @@
             style="@style/Typography.SubHeading"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="@dimen/spacing_medium"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/cardDateBadge"
             app:layout_constraintTop_toTopOf="@id/cardDateBadge"
@@ -72,7 +67,7 @@
             android:id="@+id/layoutDateTime"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="@dimen/spacing_tiny"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="@id/tvEventTitle"
@@ -87,11 +82,10 @@
 
             <TextView
                 android:id="@+id/tvEventTime"
-                style="@style/Typography.Body"
+                style="@style/Typography.Caption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:textSize="12sp"
+                android:layout_marginStart="@dimen/spacing_tiny"
                 tools:text="Sept 15, 12pm" />
         </LinearLayout>
 
@@ -99,7 +93,7 @@
             android:id="@+id/layoutLocation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="@dimen/spacing_tiny"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="@id/tvEventTitle"
@@ -114,11 +108,10 @@
 
             <TextView
                 android:id="@+id/tvEventLocation"
-                style="@style/Typography.Body"
+                style="@style/Typography.Caption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:textSize="12sp"
+                android:layout_marginStart="@dimen/spacing_tiny"
                 tools:text="Student Union" />
         </LinearLayout>
 
@@ -126,7 +119,7 @@
             android:id="@+id/divider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/spacing_medium"
             android:background="@color/border_light"
             app:layout_constraintTop_toBottomOf="@id/layoutLocation" />
 
@@ -135,16 +128,15 @@
             style="@style/Typography.Label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/spacing_medium"
             android:text="View Details"
             android:textColor="@color/primary_navy"
-            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/divider" />
 
         <ImageView
-            android:layout_width="16dp"
-            android:layout_height="16dp"
+            android:layout_width="@dimen/icon_size_small"
+            android:layout_height="@dimen/icon_size_small"
             android:src="@drawable/ic_chevron_right"
             app:layout_constraintBottom_toBottomOf="@id/tvViewDetails"
             app:layout_constraintEnd_toEndOf="parent"

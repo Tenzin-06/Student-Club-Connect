@@ -140,11 +140,15 @@ class EventsFragment : Fragment() {
     }
 
     private fun showLoading(isLoading: Boolean) {
-        binding.progressBar.isVisible = isLoading
-        binding.rvEvents.isVisible = !isLoading && !binding.emptyState.isVisible
+        binding.shimmerView.isVisible = isLoading
         if (isLoading) {
+            binding.shimmerView.startShimmer()
+            binding.rvEvents.isVisible = false
             binding.emptyState.isVisible = false
             binding.errorState.isVisible = false
+        } else {
+            binding.shimmerView.stopShimmer()
+            binding.rvEvents.isVisible = !binding.emptyState.isVisible
         }
     }
 

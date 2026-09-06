@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/screen_margin"
+    android:layout_marginVertical="@dimen/spacing_small"
+    app:cardCornerRadius="@dimen/card_radius"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/border_light"
+    app:strokeWidth="1dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/spacing_medium">
+
+        <View
+            android:id="@+id/shimmerBadge"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@color/chip_background"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/shimmerTitle"
+            android:layout_width="160dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="@dimen/spacing_medium"
+            android:background="@color/chip_background"
+            app:layout_constraintStart_toEndOf="@id/shimmerBadge"
+            app:layout_constraintTop_toTopOf="@id/shimmerBadge" />
+
+        <View
+            android:id="@+id/shimmerInfo1"
+            android:layout_width="100dp"
+            android:layout_height="14dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/chip_background"
+            app:layout_constraintStart_toStartOf="@id/shimmerTitle"
+            app:layout_constraintTop_toBottomOf="@id/shimmerTitle" />
+
+        <View
+            android:id="@+id/shimmerInfo2"
+            android:layout_width="80dp"
+            android:layout_height="14dp"
+            android:layout_marginTop="4dp"
+            android:background="@color/chip_background"
+            app:layout_constraintStart_toStartOf="@id/shimmerTitle"
+            app:layout_constraintTop_toBottomOf="@id/shimmerInfo1" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

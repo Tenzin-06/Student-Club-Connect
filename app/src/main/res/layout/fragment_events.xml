@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_light"
-    android:paddingTop="16dp">
+    android:paddingTop="@dimen/spacing_medium">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
@@ -25,32 +25,45 @@
         style="@style/Typography.Heading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginStart="@dimen/screen_margin"
+        android:layout_marginTop="32dp"
         android:text="Upcoming Events"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimmerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/spacing_medium"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvUpcomingEvents"
+        app:shimmer_auto_start="true"
+        app:shimmer_duration="1200">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <include layout="@layout/shimmer_item_event" />
+            <include layout="@layout/shimmer_item_event" />
+            <include layout="@layout/shimmer_item_event" />
+            <include layout="@layout/shimmer_item_event" />
+        </LinearLayout>
+    </com.facebook.shimmer.ShimmerFrameLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvEvents"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/spacing_medium"
         android:clipToPadding="false"
         android:paddingBottom="80dp"
+        android:layoutAnimation="@anim/layout_animation_fall_down"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvUpcomingEvents"
         tools:listitem="@layout/item_event" />
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvUpcomingEvents" />
 
     <LinearLayout
         android:id="@+id/emptyState"
@@ -74,7 +87,7 @@
             style="@style/Typography.Body"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/spacing_small"
             android:text="There are currently no upcoming events."
             android:textAlignment="center" />
     </LinearLayout>
@@ -101,7 +114,7 @@
             style="@style/Typography.Body"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/spacing_small"
             android:text="Please check your connection and try again."
             android:textAlignment="center" />
 
@@ -110,7 +123,7 @@
             style="@style/Component.Button.Text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/spacing_medium"
             android:text="Retry" />
     </LinearLayout>
 
@@ -118,7 +131,7 @@
         android:id="@+id/fabAddEvent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="24dp"
+        android:layout_margin="@dimen/spacing_large"
         android:src="@drawable/ic_add"
         android:visibility="gone"
         app:backgroundTint="@color/primary_navy"
