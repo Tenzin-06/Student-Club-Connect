@@ -15,7 +15,12 @@ import com.studentclubconnect.viewmodel.ClubState
 import com.studentclubconnect.viewmodel.ClubViewModel
 import com.studentclubconnect.viewmodel.EventState
 import com.studentclubconnect.viewmodel.EventViewModel
+import com.studentclubconnect.viewmodel.EventReminderState
+import com.studentclubconnect.viewmodel.EventReminderViewModel
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class EventDetailsActivity : AppCompatActivity() {
 
@@ -23,6 +28,10 @@ class EventDetailsActivity : AppCompatActivity() {
     private val eventViewModel: EventViewModel by viewModels()
     private val clubViewModel: ClubViewModel by viewModels()
     private val authViewModel: AuthViewModel by viewModels()
+    private val reminderViewModel: EventReminderViewModel by viewModels()
+
+    private var currentReminderId: String? = null
+    private var isReminderSet = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +49,12 @@ class EventDetailsActivity : AppCompatActivity() {
         observeViewModels(eventId)
         
         eventViewModel.getEventById(eventId)
+        reminderViewModel.checkReminder(eventId)
         authViewModel.getCurrentUser()?.uid?.let { authViewModel.loadUserProfile(it) }
+
+        binding.btnSetReminder.setOnClickListener {
+            toggleReminder()
+        }
 
         binding.btnEditEvent.setOnClickListener {
             val intent = android.content.Intent(this, AddEditEventActivity::class.java).apply {
@@ -92,6 +106,36 @@ class EventDetailsActivity : AppCompatActivity() {
             }
         }
 
+        // Observe Reminders
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                reminderViewModel.reminderState.collect { state ->
+                    when (state) {
+                        is EventReminderState.Loading -> {
+                            binding.btnSetReminder.isEnabled = false
+                        }
+                        is EventReminderState.SingleSuccess -> {
+                            binding.btnSetReminder.isEnabled = true
+                            isReminderSet = state.reminder != null
+                            currentReminderId = state.reminder?.id
+                            updateReminderButtonUI()
+                        }
+                        is EventReminderState.ActionSuccess -> {
+                            binding.btnSetReminder.isEnabled = true
+                            Toast.makeText(this@EventDetailsActivity, state.message, Toast.LENGTH_SHORT).show()
+                            // Re-check to update UI correctly
+                            reminderViewModel.checkReminder(eventId)
+                        }
+                        is EventReminderState.Error -> {
+                            binding.btnSetReminder.isEnabled = true
+                            Toast.makeText(this@EventDetailsActivity, state.message, Toast.LENGTH_SHORT).show()
+                        }
+                        else -> {}
+                    }
+                }
+            }
+        }
+
         // Observe User Role for Admin Actions
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -109,6 +153,97 @@ class EventDetailsActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+    }
+
+    private fun updateReminderButtonUI() {
+        binding.btnSetReminder.text = if (isReminderSet) "✓ Reminder already set" else "🔔 Set Reminder"
+        // If already set, we can keep it disabled or allow removal. 
+        // The prompt says "Do not create another reminder when the user taps the button again".
+    }
+
+    private fun toggleReminder() {
+        if (isReminderSet) {
+            // Option: Allow removal if tapped again, or just show toast
+            AlertDialog.Builder(this)
+                .setTitle("Reminder Already Set")
+                .setMessage("A reminder is already set for this event. Would you like to remove it?")
+                .setPositiveButton("Remove") { _, _ ->
+                    currentReminderId?.let { reminderViewModel.deleteReminder(it) }
+                }
+                .setNegativeButton("Keep", null)
+                .show()
+            return
+        }
+
+        val event = (eventViewModel.eventState.value as? EventState.SingleSuccess)?.event
+        if (event == null) {
+            Toast.makeText(this, "Unable to load event data", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        showReminderOptionsDialog(event)
+    }
+
+    private fun showReminderOptionsDialog(event: com.studentclubconnect.data.model.Event) {
+        val options = arrayOf("1 hour before", "1 day before")
+        var selectedOption = 0
+
+        AlertDialog.Builder(this)
+            .setTitle("Set Reminder")
+            .setSingleChoiceItems(options, 0) { _, which ->
+                selectedOption = if (which == 0) 0 else 1
+            }
+            .setPositiveButton("Set Reminder") { _, _ ->
+                calculateAndSaveReminder(event, selectedOption)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun calculateAndSaveReminder(event: com.studentclubconnect.data.model.Event, option: Int) {
+        try {
+            val dateTimeStr = "${event.date} ${event.time}"
+            val format = SimpleDateFormat("yyyy-MM-dd hh:mm a", Locale.getDefault())
+            val eventDate = format.parse(dateTimeStr)
+
+            if (eventDate == null) {
+                Toast.makeText(this, "Invalid event date/time", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            val calendar = Calendar.getInstance()
+            calendar.time = eventDate
+
+            if (option == 0) { // 1 hour before
+                calendar.add(Calendar.HOUR_OF_DAY, -1)
+            } else { // 1 day before
+                calendar.add(Calendar.DAY_OF_YEAR, -1)
+            }
+
+            val reminderTime = calendar.time
+            val now = Calendar.getInstance().time
+
+            if (reminderTime.before(now)) {
+                Toast.makeText(this, "Reminder time has already passed", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            val userId = authViewModel.getCurrentUser()?.uid
+            if (userId == null) {
+                Toast.makeText(this, "Please log in to set reminders", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            val reminder = com.studentclubconnect.data.model.EventReminder(
+                eventId = event.id,
+                userId = userId,
+                reminderTime = reminderTime
+            )
+            reminderViewModel.saveReminder(reminder)
+
+        } catch (e: Exception) {
+            Toast.makeText(this, "Unable to set reminder. Please try again.", Toast.LENGTH_SHORT).show()
         }
     }
 
