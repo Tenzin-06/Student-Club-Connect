@@ -15,10 +15,7 @@ import com.google.android.material.timepicker.TimeFormat
 import com.studentclubconnect.data.model.Club
 import com.studentclubconnect.data.model.Event
 import com.studentclubconnect.databinding.ActivityAddEditEventBinding
-<<<<<<< HEAD
-=======
 import com.studentclubconnect.viewmodel.AuthViewModel
->>>>>>> feat/role-based-access
 import com.studentclubconnect.viewmodel.ClubState
 import com.studentclubconnect.viewmodel.ClubViewModel
 import com.studentclubconnect.viewmodel.EventState
@@ -34,10 +31,7 @@ class AddEditEventActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAddEditEventBinding
     private val eventViewModel: EventViewModel by viewModels()
     private val clubViewModel: ClubViewModel by viewModels()
-<<<<<<< HEAD
-=======
     private val authViewModel: AuthViewModel by viewModels()
->>>>>>> feat/role-based-access
     
     private var eventId: String? = null
     private var isEditMode = false
@@ -56,10 +50,7 @@ class AddEditEventActivity : AppCompatActivity() {
         setupPickers()
         observeViewModels()
 
-<<<<<<< HEAD
-=======
         authViewModel.getCurrentUser()?.uid?.let { authViewModel.loadUserProfile(it) }
->>>>>>> feat/role-based-access
         clubViewModel.getClubs()
 
         if (isEditMode) {
@@ -154,23 +145,6 @@ class AddEditEventActivity : AppCompatActivity() {
         // Observe Clubs for Dropdown
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-<<<<<<< HEAD
-                clubViewModel.clubState.collect { state ->
-                    if (state is ClubState.Success) {
-                        clubsList = state.clubs
-                        val clubNames = clubsList.map { it.name }
-                        val adapter = ArrayAdapter(this@AddEditEventActivity, android.R.layout.simple_dropdown_item_1line, clubNames)
-                        binding.actvClub.setAdapter(adapter)
-                        
-                        binding.actvClub.setOnItemClickListener { _, _, position, _ ->
-                            selectedClubId = clubsList[position].id
-                        }
-                        
-                        // If editing, re-set the club name to match the loaded ID
-                        if (isEditMode && selectedClubId.isNotEmpty()) {
-                            val selectedClub = clubsList.find { it.id == selectedClubId }
-                            selectedClub?.let { binding.actvClub.setText(it.name, false) }
-=======
                 // Wait for user profile to know the role
                 authViewModel.userProfile.collect { user ->
                     val userRole = user?.role?.lowercase()
@@ -202,7 +176,6 @@ class AddEditEventActivity : AppCompatActivity() {
                                 binding.actvClub.setText(club.name, false)
                                 selectedClubId = club.id
                             }
->>>>>>> feat/role-based-access
                         }
                     }
                 }

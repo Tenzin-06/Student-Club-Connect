@@ -10,6 +10,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.studentclubconnect.data.model.Club
+import com.studentclubconnect.data.model.User
 import com.studentclubconnect.databinding.ActivityAddEditClubBinding
 import com.studentclubconnect.viewmodel.ClubState
 import com.studentclubconnect.viewmodel.ClubViewModel
@@ -21,6 +22,10 @@ class AddEditClubActivity : AppCompatActivity() {
     private val viewModel: ClubViewModel by viewModels()
     private var clubId: String? = null
     private var isEditMode = false
+    
+    private var eligibleStudents: List<User> = emptyList()
+    private var selectedPresidentId: String = ""
+    private var selectedPresidentName: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +38,8 @@ class AddEditClubActivity : AppCompatActivity() {
         setupToolbar()
         setupCategoryDropdown()
         observeViewModel()
+
+        viewModel.getEligibleStudents()
 
         if (isEditMode) {
             binding.toolbar.title = "Edit Club"
@@ -66,6 +73,12 @@ class AddEditClubActivity : AppCompatActivity() {
                             binding.progressBar.isVisible = true
                             binding.btnSubmit.isEnabled = false
                         }
+                        is ClubState.StudentsLoaded -> {
+                            binding.progressBar.isVisible = false
+                            binding.btnSubmit.isEnabled = true
+                            eligibleStudents = state.students
+                            setupPresidentDropdown()
+                        }
                         is ClubState.SingleSuccess -> {
                             binding.progressBar.isVisible = false
                             binding.btnSubmit.isEnabled = true
@@ -90,22 +103,50 @@ class AddEditClubActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupPresidentDropdown() {
+        val displayList = mutableListOf<User>()
+        // Add "None" option at the top
+        displayList.add(User(uid = "", name = "None (No President)"))
+        
+        displayList.addAll(eligibleStudents)
+        
+        // Add current president if in edit mode and not in list
+        if (isEditMode && selectedPresidentId.isNotEmpty() && eligibleStudents.none { it.uid == selectedPresidentId }) {
+            displayList.add(1, User(uid = selectedPresidentId, name = selectedPresidentName))
+        }
+
+        val names = displayList.map { it.name }
+        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, names)
+        binding.actvPresident.setAdapter(adapter)
+        
+        binding.actvPresident.setOnItemClickListener { _, _, position, _ ->
+            val user = displayList[position]
+            selectedPresidentId = user.uid
+            selectedPresidentName = if (user.uid.isEmpty()) "" else user.name
+        }
+    }
+
     private fun populateFields(club: Club) {
         binding.apply {
             etClubName.setText(club.name)
             actvCategory.setText(club.category, false)
-            etPresident.setText(club.president)
+            actvPresident.setText(club.president, false)
+            selectedPresidentId = club.presidentId
+            selectedPresidentName = club.president
             etImageUrl.setText(club.imageUrl)
             etDescription.setText(club.description)
+            
+            // Re-setup dropdown to include current president if necessary
+            setupPresidentDropdown()
         }
     }
 
     private fun validateAndSubmit() {
         val name = binding.etClubName.text.toString().trim()
         val category = binding.actvCategory.text.toString().trim()
-        val president = binding.etPresident.text.toString().trim()
-        val imageUrl = binding.etImageUrl.text.toString().trim()
+        val president = binding.actvPresident.text.toString().trim()
         val description = binding.etDescription.text.toString().trim()
+        val imageUrl = binding.etImageUrl.text.toString().trim()
 
         var isValid = true
 
@@ -123,6 +164,13 @@ class AddEditClubActivity : AppCompatActivity() {
             binding.tilCategory.error = null
         }
 
+        if (president.isEmpty()) {
+            binding.tilPresident.error = "President selection is required"
+            isValid = false
+        } else {
+            binding.tilPresident.error = null
+        }
+
         if (description.isEmpty()) {
             binding.tilDescription.error = "Description is required"
             isValid = false
@@ -135,7 +183,8 @@ class AddEditClubActivity : AppCompatActivity() {
                 id = clubId ?: "",
                 name = name,
                 category = category,
-                president = president,
+                president = selectedPresidentName,
+                presidentId = selectedPresidentId,
                 imageUrl = imageUrl,
                 description = description
             )

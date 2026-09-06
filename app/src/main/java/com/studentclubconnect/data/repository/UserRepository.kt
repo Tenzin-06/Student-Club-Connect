@@ -45,4 +45,21 @@ class UserRepository(private val firestore: FirebaseFirestore = FirebaseFirestor
             Result.failure(e)
         }
     }
+
+    /**
+     * Retrieves all users who are currently students and not presidents.
+     */
+    suspend fun getEligibleStudents(): Result<List<User>> {
+        return try {
+            val snapshot = firestore.collection("users")
+                .whereEqualTo("role", "student")
+                .get()
+                .await()
+            val students = snapshot.toObjects(User::class.java)
+            Result.success(students)
+        } catch (e: Exception) {
+            android.util.Log.e("UserRepository", "Failed to get eligible students", e)
+            Result.failure(e)
+        }
+    }
 }
