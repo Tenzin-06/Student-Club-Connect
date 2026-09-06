@@ -2,6 +2,7 @@ package com.studentclubconnect.ui.clubs
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -12,7 +13,13 @@ import com.studentclubconnect.utils.TimeUtils
 /**
  * Adapter for displaying announcements in a list.
  */
-class AnnouncementAdapter : ListAdapter<Announcement, AnnouncementAdapter.AnnouncementViewHolder>(AnnouncementDiffCallback()) {
+class AnnouncementAdapter(
+    private val currentUserId: String? = null,
+    private val currentUserRole: String? = null,
+    private val userPresidentOf: String? = null,
+    private val onEditClick: ((Announcement) -> Unit)? = null,
+    private val onDeleteClick: ((Announcement) -> Unit)? = null
+) : ListAdapter<Announcement, AnnouncementAdapter.AnnouncementViewHolder>(AnnouncementDiffCallback()) {
 
     private var clubNames: Map<String, String> = emptyMap()
 
@@ -35,7 +42,7 @@ class AnnouncementAdapter : ListAdapter<Announcement, AnnouncementAdapter.Announ
         holder.bind(announcement, clubNames[announcement.clubId])
     }
 
-    class AnnouncementViewHolder(private val binding: ItemAnnouncementBinding) :
+    inner class AnnouncementViewHolder(private val binding: ItemAnnouncementBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(announcement: Announcement, clubName: String?) {
@@ -44,6 +51,15 @@ class AnnouncementAdapter : ListAdapter<Announcement, AnnouncementAdapter.Announ
                 tvAnnouncementClub.text = clubName ?: "Unknown Club"
                 tvAnnouncementMessage.text = announcement.message
                 tvAnnouncementTime.text = TimeUtils.getRelativeTime(announcement.createdAt)
+
+                val isAdmin = currentUserRole?.lowercase() == "admin"
+                val isPresident = currentUserRole?.lowercase() == "president" && 
+                                announcement.clubId == userPresidentOf
+                
+                layoutManagement.isVisible = (isAdmin || isPresident) && (onEditClick != null || onDeleteClick != null)
+                
+                btnEdit.setOnClickListener { onEditClick?.invoke(announcement) }
+                btnDelete.setOnClickListener { onDeleteClick?.invoke(announcement) }
             }
         }
     }
