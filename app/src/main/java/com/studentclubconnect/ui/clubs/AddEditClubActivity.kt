@@ -12,6 +12,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.studentclubconnect.data.model.Club
 import com.studentclubconnect.data.model.User
 import com.studentclubconnect.databinding.ActivityAddEditClubBinding
+import com.studentclubconnect.viewmodel.AuthViewModel
 import com.studentclubconnect.viewmodel.ClubState
 import com.studentclubconnect.viewmodel.ClubViewModel
 import kotlinx.coroutines.launch
@@ -20,6 +21,7 @@ class AddEditClubActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddEditClubBinding
     private val viewModel: ClubViewModel by viewModels()
+    private val authViewModel: AuthViewModel by viewModels()
     private var clubId: String? = null
     private var isEditMode = false
     
@@ -39,6 +41,10 @@ class AddEditClubActivity : AppCompatActivity() {
         setupCategoryDropdown()
         observeViewModel()
 
+        val uid = authViewModel.getCurrentUser()?.uid
+        if (uid != null) {
+            authViewModel.loadUserProfile(uid)
+        }
         viewModel.getEligibleStudents()
 
         if (isEditMode) {
@@ -67,36 +73,48 @@ class AddEditClubActivity : AppCompatActivity() {
     private fun observeViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.clubState.collect { state ->
-                    when (state) {
-                        is ClubState.Loading -> {
-                            binding.progressBar.isVisible = true
-                            binding.btnSubmit.isEnabled = false
+                launch {
+                    authViewModel.userProfile.collect { user ->
+                        val isPresident = user?.role?.lowercase() == "president"
+                        if (isPresident) {
+                            binding.tilPresident.isEnabled = false
+                            binding.actvPresident.isEnabled = false
                         }
-                        is ClubState.StudentsLoaded -> {
-                            binding.progressBar.isVisible = false
-                            binding.btnSubmit.isEnabled = true
-                            eligibleStudents = state.students
-                            setupPresidentDropdown()
-                        }
-                        is ClubState.SingleSuccess -> {
-                            binding.progressBar.isVisible = false
-                            binding.btnSubmit.isEnabled = true
-                            if (isEditMode && state.club != null) {
-                                populateFields(state.club)
+                    }
+                }
+                
+                launch {
+                    viewModel.clubState.collect { state ->
+                        when (state) {
+                            is ClubState.Loading -> {
+                                binding.progressBar.isVisible = true
+                                binding.btnSubmit.isEnabled = false
                             }
+                            is ClubState.StudentsLoaded -> {
+                                binding.progressBar.isVisible = false
+                                binding.btnSubmit.isEnabled = true
+                                eligibleStudents = state.students
+                                setupPresidentDropdown()
+                            }
+                            is ClubState.SingleSuccess -> {
+                                binding.progressBar.isVisible = false
+                                binding.btnSubmit.isEnabled = true
+                                if (isEditMode && state.club != null) {
+                                    populateFields(state.club)
+                                }
+                            }
+                            is ClubState.ActionSuccess -> {
+                                binding.progressBar.isVisible = false
+                                Toast.makeText(this@AddEditClubActivity, state.message, Toast.LENGTH_SHORT).show()
+                                finish()
+                            }
+                            is ClubState.Error -> {
+                                binding.progressBar.isVisible = false
+                                binding.btnSubmit.isEnabled = true
+                                Toast.makeText(this@AddEditClubActivity, state.message, Toast.LENGTH_SHORT).show()
+                            }
+                            else -> {}
                         }
-                        is ClubState.ActionSuccess -> {
-                            binding.progressBar.isVisible = false
-                            Toast.makeText(this@AddEditClubActivity, state.message, Toast.LENGTH_SHORT).show()
-                            finish()
-                        }
-                        is ClubState.Error -> {
-                            binding.progressBar.isVisible = false
-                            binding.btnSubmit.isEnabled = true
-                            Toast.makeText(this@AddEditClubActivity, state.message, Toast.LENGTH_SHORT).show()
-                        }
-                        else -> {}
                     }
                 }
             }

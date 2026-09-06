@@ -303,6 +303,38 @@
             android:orientation="vertical"
             app:layout_constraintTop_toBottomOf="@id/llInfo">
 
+            <!-- My Club (President Only) -->
+            <LinearLayout
+                android:id="@+id/btnMyClubDashboard"
+                style="@style/ProfileListItem"
+                android:visibility="gone"
+                tools:visibility="visible">
+                <ImageView style="@style/ProfileInfoIcon" android:src="@drawable/ic_dashboard" app:tint="@color/primary_navy" />
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        style="@style/Typography.SubHeading"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Club Dashboard" />
+                </LinearLayout>
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_chevron_right" />
+            </LinearLayout>
+
+            <View
+                android:id="@+id/dividerMyClub"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/border_light"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
             <!-- Edit Profile -->
             <LinearLayout
                 android:id="@+id/btnEditProfileItem"

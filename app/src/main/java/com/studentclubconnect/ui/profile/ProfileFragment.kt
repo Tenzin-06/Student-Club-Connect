@@ -15,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.firebase.auth.FirebaseAuth
 import com.studentclubconnect.LoginActivity
+import com.studentclubconnect.R
 import com.studentclubconnect.data.model.User
 import com.studentclubconnect.databinding.FragmentProfileBinding
 import com.studentclubconnect.viewmodel.ProfileState
@@ -71,6 +72,15 @@ class ProfileFragment : Fragment() {
     }
 
     private fun setupListeners() {
+        binding.btnMyClubDashboard.setOnClickListener {
+            currentUser?.presidentOf?.let { clubId ->
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.nav_host_fragment, MyClubFragment.newInstance(clubId))
+                    .addToBackStack(null)
+                    .commit()
+            }
+        }
+
         binding.btnEditProfileItem.setOnClickListener {
             toggleEditMode(true)
         }
@@ -135,6 +145,11 @@ class ProfileFragment : Fragment() {
             android.util.Log.w("ProfileFragment", "displayProfile: User is null")
             return
         }
+
+        // Handle My Club visibility for presidents
+        val isPresident = user.role.lowercase() == "president" && !user.presidentOf.isNullOrEmpty()
+        binding.btnMyClubDashboard.isVisible = isPresident
+        binding.dividerMyClub.isVisible = isPresident
 
         android.util.Log.d("ProfileFragment", "Displaying profile for: ${user.name}, ID: ${user.studentId}")
         binding.tvProfileName.text = user.name.ifEmpty { "Student Name" }
