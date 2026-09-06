@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="20dp"
+    android:layout_marginVertical="6dp"
+    app:cardBackgroundColor="@color/surface_white"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/border_light"
+    app:strokeWidth="1dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardIcon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:cardBackgroundColor="@color/background_light"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/ivNotificationIcon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="10dp"
+                android:src="@drawable/ic_announcement"
+                app:tint="@color/primary_navy" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:id="@+id/tvNotificationClub"
+            style="@style/Typography.Label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/cardIcon"
+            app:layout_constraintTop_toTopOf="@id/cardIcon"
+            tools:text="Photography Club" />
+
+        <TextView
+            android:id="@+id/tvNotificationTitle"
+            style="@style/Typography.Body"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_main"
+            app:layout_constraintEnd_toEndOf="@id/tvNotificationClub"
+            app:layout_constraintStart_toStartOf="@id/tvNotificationClub"
+            app:layout_constraintTop_toBottomOf="@id/tvNotificationClub"
+            tools:text="New announcement posted" />
+
+        <TextView
+            android:id="@+id/tvNotificationTime"
+            style="@style/Typography.Body"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="@id/tvNotificationClub"
+            app:layout_constraintStart_toStartOf="@id/tvNotificationClub"
+            app:layout_constraintTop_toBottomOf="@id/tvNotificationTitle"
+            tools:text="Posted 2 hours ago" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>
