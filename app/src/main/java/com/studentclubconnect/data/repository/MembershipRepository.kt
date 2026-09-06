@@ -81,6 +81,23 @@ class MembershipRepository(private val firestore: FirebaseFirestore = FirebaseFi
     }
 
     /**
+     * Retrieves all active memberships across all clubs.
+     */
+    suspend fun getAllMemberships(): Result<List<Membership>> {
+        return try {
+            val snapshot = membershipsCollection
+                .whereEqualTo("status", "active")
+                .get()
+                .await()
+            val memberships = snapshot.toObjects(Membership::class.java)
+            Result.success(memberships)
+        } catch (e: Exception) {
+            android.util.Log.e("MembershipRepository", "Error getting all memberships", e)
+            Result.failure(e)
+        }
+    }
+
+    /**
      * Retrieves all active memberships for a specific club.
      */
     suspend fun getMembershipsByClub(clubId: String): Result<List<Membership>> {

@@ -50,15 +50,22 @@ class UserRepository(private val firestore: FirebaseFirestore = FirebaseFirestor
      * Retrieves all users who are currently students and not presidents.
      */
     suspend fun getEligibleStudents(): Result<List<User>> {
+        return getUsersByRole("student")
+    }
+
+    /**
+     * Retrieves all users with a specific role.
+     */
+    suspend fun getUsersByRole(role: String): Result<List<User>> {
         return try {
             val snapshot = firestore.collection("users")
-                .whereEqualTo("role", "student")
+                .whereEqualTo("role", role)
                 .get()
                 .await()
-            val students = snapshot.toObjects(User::class.java)
-            Result.success(students)
+            val users = snapshot.toObjects(User::class.java)
+            Result.success(users)
         } catch (e: Exception) {
-            android.util.Log.e("UserRepository", "Failed to get eligible students", e)
+            android.util.Log.e("UserRepository", "Failed to get users by role: $role", e)
             Result.failure(e)
         }
     }
