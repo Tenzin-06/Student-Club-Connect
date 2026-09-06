@@ -2,41 +2,35 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Component.Card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="20dp"
-    android:layout_marginVertical="8dp"
-    app:cardBackgroundColor="@color/surface_white"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="0dp"
-    app:strokeColor="@color/border_light"
-    app:strokeWidth="1dp">
+    android:layout_marginHorizontal="@dimen/screen_margin"
+    android:layout_marginVertical="@dimen/spacing_small">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="@dimen/spacing_medium">
 
         <TextView
             android:id="@+id/tvAnnouncementTitle"
             style="@style/Typography.SubHeading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawablePadding="8dp"
-            android:textStyle="bold"
+            android:drawablePadding="@dimen/spacing_small"
             app:drawableStartCompat="@drawable/ic_announcement"
             app:drawableTint="@color/primary_navy"
             tools:text="Photography Competition" />
 
         <TextView
             android:id="@+id/tvAnnouncementClub"
-            style="@style/Typography.Body"
+            style="@style/Typography.Caption"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="@dimen/spacing_tiny"
             android:textColor="@color/primary_navy"
-            android:textSize="12sp"
             android:textStyle="bold"
             tools:text="Photography Club" />
 
@@ -45,23 +39,22 @@
             style="@style/Typography.Body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="@dimen/spacing_tiny"
             tools:text="Submit your best nature shots by this Friday for a chance to win!" />
 
         <TextView
             android:id="@+id/tvAnnouncementTime"
-            style="@style/Typography.Body"
+            style="@style/Typography.Caption"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textSize="12sp"
+            android:layout_marginTop="@dimen/spacing_small"
             tools:text="Posted 2 hours ago" />
 
         <LinearLayout
             android:id="@+id/layoutManagement"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/spacing_small"
             android:gravity="end"
             android:orientation="horizontal"
             android:visibility="gone"

@@ -10,16 +10,16 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="24dp"
-        android:paddingTop="24dp"
-        android:paddingBottom="24dp">
+        android:paddingHorizontal="@dimen/screen_margin"
+        android:paddingTop="@dimen/spacing_large"
+        android:paddingBottom="@dimen/spacing_large">
 
         <!-- Profile Header -->
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/ivProfilePicture"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_marginTop="8dp"
+            android:layout_width="@dimen/profile_image_size"
+            android:layout_height="@dimen/profile_image_size"
+            android:layout_marginTop="@dimen/spacing_small"
             android:padding="2dp"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_profile"
@@ -35,7 +35,7 @@
             style="@style/Typography.Heading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/spacing_medium"
             android:text="Student Name"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -46,7 +46,7 @@
             style="@style/Typography.Body"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="@dimen/spacing_tiny"
             android:text="Student ID"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -57,9 +57,9 @@
             android:id="@+id/clStats"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="@dimen/spacing_large"
             android:background="@drawable/bg_stats_card"
-            android:padding="16dp"
+            android:padding="@dimen/spacing_medium"
             app:layout_constraintTop_toBottomOf="@id/tvProfileStudentId">
 
             <LinearLayout
@@ -83,11 +83,10 @@
                     android:textColor="@color/primary_navy" />
 
                 <TextView
-                    style="@style/Typography.Body"
+                    style="@style/Typography.Caption"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Clubs Joined"
-                    android:textSize="12sp" />
+                    android:text="Clubs Joined" />
             </LinearLayout>
 
             <View
@@ -121,11 +120,10 @@
                     android:textColor="@color/primary_navy" />
 
                 <TextView
-                    style="@style/Typography.Body"
+                    style="@style/Typography.Caption"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Events Registered"
-                    android:textSize="12sp" />
+                    android:text="Events Registered" />
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -134,7 +132,7 @@
             android:id="@+id/llInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="@dimen/spacing_large"
             android:orientation="vertical"
             app:layout_constraintTop_toBottomOf="@id/clStats">
 
@@ -144,13 +142,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="@dimen/spacing_medium"
                 android:visibility="gone">
                 <TextView style="@style/Typography.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Full Name" />
                 <EditText
                     android:id="@+id/etProfileName"
                     style="@style/Component.Input"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="@dimen/spacing_small"
                     android:hint="Enter your name"
                     android:inputType="textPersonName" />
             </LinearLayout>
@@ -170,14 +168,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="@dimen/spacing_medium"
                 android:visibility="gone">
                 <TextView style="@style/Typography.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Programme" />
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="@dimen/spacing_small"
                     app:hintEnabled="false">
                     <AutoCompleteTextView
                         android:id="@+id/actvProgramme"
@@ -203,14 +201,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="@dimen/spacing_medium"
                 android:visibility="gone">
                 <TextView style="@style/Typography.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Department" />
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="@dimen/spacing_small"
                     app:hintEnabled="false">
                     <AutoCompleteTextView
                         android:id="@+id/actvDepartment"
@@ -236,14 +234,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="@dimen/spacing_medium"
                 android:visibility="gone">
                 <TextView style="@style/Typography.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Semester" />
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="@dimen/spacing_small"
                     app:hintEnabled="false">
                     <AutoCompleteTextView
                         android:id="@+id/actvSemester"
@@ -280,13 +278,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="@dimen/spacing_medium"
                 android:visibility="gone">
                 <TextView style="@style/Typography.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Phone" />
                 <EditText
                     android:id="@+id/etProfilePhone"
                     style="@style/Component.Input"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="@dimen/spacing_small"
                     android:hint="Enter phone number"
                     android:inputType="phone" />
             </LinearLayout>
@@ -298,12 +296,12 @@
             android:id="@+id/llActions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="@dimen/spacing_large"
             android:background="@drawable/bg_stats_card"
             android:orientation="vertical"
             app:layout_constraintTop_toBottomOf="@id/llInfo">
 
-            <!-- My Club (President Only) -->
+            <!-- Club Dashboard (President Only) -->
             <LinearLayout
                 android:id="@+id/btnMyClubDashboard"
                 style="@style/ProfileListItem"
@@ -449,7 +447,7 @@
         <Button
             android:id="@+id/btnSaveChanges"
             style="@style/Component.Button.Primary"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="@dimen/spacing_huge"
             android:text="Save Changes"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"

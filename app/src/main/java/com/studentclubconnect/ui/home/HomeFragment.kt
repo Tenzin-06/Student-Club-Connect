@@ -130,13 +130,20 @@ class HomeFragment : Fragment() {
                 viewModel.homeState.collect { state ->
                     when (state) {
                         is HomeState.Loading -> {
-                            binding.progressBar.isVisible = true
+                            binding.shimmerView.isVisible = true
+                            binding.shimmerView.startShimmer()
+                            binding.rvRecentAnnouncements.isVisible = false
+                            binding.rvUpcomingEvents.isVisible = false
+                            binding.rvMyClubs.isVisible = false
+                            binding.rvPopularClubs.isVisible = false
+                            
                             binding.cardNoAnnouncements.isVisible = false
                             binding.cardNoEvents.isVisible = false
                             binding.cardNoClubs.isVisible = false
                         }
                         is HomeState.Success -> {
-                            binding.progressBar.isVisible = false
+                            binding.shimmerView.stopShimmer()
+                            binding.shimmerView.isVisible = false
                             
                             // Welcome Message
                             val userName = state.user?.name ?: "Student"
@@ -184,7 +191,8 @@ class HomeFragment : Fragment() {
                             }
                         }
                         is HomeState.Error -> {
-                            binding.progressBar.isVisible = false
+                            binding.shimmerView.stopShimmer()
+                            binding.shimmerView.isVisible = false
                             Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
                         }
                     }

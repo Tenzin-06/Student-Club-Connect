@@ -18,10 +18,11 @@
             style="@style/Typography.Heading"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginStart="@dimen/screen_margin"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="@dimen/spacing_medium"
             android:text="Hello, Student 👋"
+            android:lineSpacingExtra="4dp"
             app:layout_constraintEnd_toStartOf="@id/ivNotifications"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -29,52 +30,80 @@
 
         <ImageView
             android:id="@+id/ivNotifications"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="20dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="@dimen/screen_margin"
+            android:background="@drawable/bg_icon_button"
             android:clickable="true"
             android:focusable="true"
-            android:padding="8dp"
+            android:padding="10dp"
             android:src="@drawable/ic_notifications"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/text_main" />
+            app:tint="@color/primary_navy" />
 
         <!-- Search Bar -->
-        <LinearLayout
-            android:id="@+id/searchContainer"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/searchCard"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/bg_input_field"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingHorizontal="16dp"
-            app:layout_constraintTop_toBottomOf="@id/tvGreeting">
+            android:layout_height="52dp"
+            android:layout_marginHorizontal="@dimen/screen_margin"
+            android:layout_marginTop="28dp"
+            app:cardBackgroundColor="@color/input_background"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:layout_constraintTop_toBottomOf="@id/tvGreeting"
+            app:strokeWidth="0dp">
 
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/ic_search"
-                app:tint="@color/text_secondary" />
-
-            <EditText
-                android:id="@+id/etSearch"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@android:color/transparent"
-                android:hint="Search clubs and events"
-                android:importantForAutofill="no"
-                android:inputType="text"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:textColor="@color/text_main"
-                android:textColorHint="@color/text_secondary"
-                android:textSize="14sp" />
-        </LinearLayout>
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_search"
+                    app:tint="@color/text_secondary" />
+
+                <EditText
+                    android:id="@+id/etSearch"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:hint="Search clubs and events"
+                    android:importantForAutofill="no"
+                    android:inputType="text"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:textColor="@color/text_main"
+                    android:textColorHint="@color/text_secondary"
+                    android:textSize="15sp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_medium"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/searchCard"
+            app:shimmer_auto_start="true"
+            app:shimmer_duration="1200">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <include layout="@layout/shimmer_item_club" />
+                <include layout="@layout/shimmer_item_event" />
+                <include layout="@layout/shimmer_item_club" />
+            </LinearLayout>
+        </com.facebook.shimmer.ShimmerFrameLayout>
 
         <!-- Popular Clubs Section -->
         <TextView
@@ -82,20 +111,20 @@
             style="@style/Typography.SubHeading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginStart="@dimen/screen_margin"
+            android:layout_marginTop="@dimen/spacing_large"
             android:text="Popular Clubs"
-            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/searchContainer" />
+            app:layout_constraintTop_toBottomOf="@id/searchCard" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvPopularClubs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/spacing_small"
             android:clipToPadding="false"
             android:nestedScrollingEnabled="false"
+            android:layoutAnimation="@anim/layout_animation_fall_down"
             app:layout_constraintTop_toBottomOf="@id/tvPopularClubsLabel"
             tools:listitem="@layout/item_club" />
 
@@ -105,20 +134,26 @@
             style="@style/Typography.SubHeading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginStart="@dimen/screen_margin"
+            android:layout_marginTop="@dimen/spacing_large"
             android:text="Upcoming Events"
-            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/rvPopularClubs" />
 
         <TextView
             android:id="@+id/btnViewAllEvents"
-            style="@style/Component.Button.Text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="12dp"
+            android:layout_marginEnd="@dimen/screen_margin"
+            android:background="@drawable/bg_view_all"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
             android:text="View All"
+            android:textColor="@color/primary_navy"
+            android:textSize="12sp"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/tvUpcomingEventsLabel"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/tvUpcomingEventsLabel" />
@@ -127,32 +162,29 @@
             android:id="@+id/rvUpcomingEvents"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/spacing_small"
             android:clipToPadding="false"
             android:nestedScrollingEnabled="false"
+            android:layoutAnimation="@anim/layout_animation_fall_down"
             app:layout_constraintTop_toBottomOf="@id/tvUpcomingEventsLabel"
             tools:listitem="@layout/item_event" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardNoEvents"
+            style="@style/Component.Card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginHorizontal="@dimen/screen_margin"
+            android:layout_marginTop="@dimen/spacing_medium"
             android:visibility="gone"
-            app:cardBackgroundColor="@color/surface_white"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="0dp"
-            app:layout_constraintTop_toBottomOf="@id/tvUpcomingEventsLabel"
-            app:strokeColor="@color/border_light"
-            app:strokeWidth="1dp">
+            app:layout_constraintTop_toBottomOf="@id/tvUpcomingEventsLabel">
 
             <TextView
                 android:id="@+id/tvNoEvents"
                 style="@style/Typography.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="20dp"
+                android:padding="@dimen/spacing_large"
                 android:gravity="center"
                 android:text="No upcoming events" />
         </com.google.android.material.card.MaterialCardView>
@@ -170,10 +202,9 @@
             style="@style/Typography.SubHeading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginStart="@dimen/screen_margin"
+            android:layout_marginTop="@dimen/spacing_large"
             android:text="Recent Announcements"
-            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/eventsBarrier" />
 
@@ -181,32 +212,29 @@
             android:id="@+id/rvRecentAnnouncements"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/spacing_small"
             android:clipToPadding="false"
             android:nestedScrollingEnabled="false"
+            android:layoutAnimation="@anim/layout_animation_fall_down"
             app:layout_constraintTop_toBottomOf="@id/tvAnnouncementsLabel"
             tools:listitem="@layout/item_announcement" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardNoAnnouncements"
+            style="@style/Component.Card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginHorizontal="@dimen/screen_margin"
+            android:layout_marginTop="@dimen/spacing_medium"
             android:visibility="gone"
-            app:cardBackgroundColor="@color/surface_white"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="0dp"
-            app:layout_constraintTop_toBottomOf="@id/tvAnnouncementsLabel"
-            app:strokeColor="@color/border_light"
-            app:strokeWidth="1dp">
+            app:layout_constraintTop_toBottomOf="@id/tvAnnouncementsLabel">
 
             <TextView
                 android:id="@+id/tvNoAnnouncements"
                 style="@style/Typography.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="20dp"
+                android:padding="@dimen/spacing_large"
                 android:gravity="center"
                 android:text="No recent announcements" />
         </com.google.android.material.card.MaterialCardView>
@@ -224,20 +252,26 @@
             style="@style/Typography.SubHeading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginStart="@dimen/screen_margin"
+            android:layout_marginTop="@dimen/spacing_large"
             android:text="My Clubs"
-            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/announcementsBarrier" />
 
         <TextView
             android:id="@+id/btnViewAllClubs"
-            style="@style/Component.Button.Text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="12dp"
+            android:layout_marginEnd="@dimen/screen_margin"
+            android:background="@drawable/bg_view_all"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
             android:text="View All"
+            android:textColor="@color/primary_navy"
+            android:textSize="12sp"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/tvMyClubsLabel"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/tvMyClubsLabel" />
@@ -246,45 +280,32 @@
             android:id="@+id/rvMyClubs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/spacing_small"
             android:clipToPadding="false"
             android:nestedScrollingEnabled="false"
+            android:layoutAnimation="@anim/layout_animation_fall_down"
             app:layout_constraintTop_toBottomOf="@id/tvMyClubsLabel"
             tools:listitem="@layout/item_club" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardNoClubs"
+            style="@style/Component.Card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginHorizontal="@dimen/screen_margin"
+            android:layout_marginTop="@dimen/spacing_medium"
             android:visibility="gone"
-            app:cardBackgroundColor="@color/surface_white"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="0dp"
-            app:layout_constraintTop_toBottomOf="@id/tvMyClubsLabel"
-            app:strokeColor="@color/border_light"
-            app:strokeWidth="1dp">
+            app:layout_constraintTop_toBottomOf="@id/tvMyClubsLabel">
 
             <TextView
                 android:id="@+id/tvNoClubs"
                 style="@style/Typography.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="20dp"
+                android:padding="@dimen/spacing_large"
                 android:gravity="center"
                 android:text="You haven't joined any clubs yet." />
         </com.google.android.material.card.MaterialCardView>
-
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

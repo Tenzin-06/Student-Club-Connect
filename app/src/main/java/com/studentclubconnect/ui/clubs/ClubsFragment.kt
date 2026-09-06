@@ -177,15 +177,19 @@ class ClubsFragment : Fragment() {
         
         // Only show empty state if we actually have no clubs after filtering, 
         // OR if the original list was empty.
-        binding.emptyState.isVisible = filteredList.isEmpty() && !binding.progressBar.isVisible
+        binding.emptyState.isVisible = filteredList.isEmpty() && !binding.shimmerView.isVisible
     }
 
     private fun showLoading(isLoading: Boolean) {
-        binding.progressBar.isVisible = isLoading
-        binding.rvClubs.isVisible = !isLoading && !binding.emptyState.isVisible
+        binding.shimmerView.isVisible = isLoading
         if (isLoading) {
+            binding.shimmerView.startShimmer()
+            binding.rvClubs.isVisible = false
             binding.emptyState.isVisible = false
             binding.errorState.isVisible = false
+        } else {
+            binding.shimmerView.stopShimmer()
+            binding.rvClubs.isVisible = !binding.emptyState.isVisible
         }
     }
 
