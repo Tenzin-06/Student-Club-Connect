@@ -61,4 +61,22 @@ class MembershipRepository(private val firestore: FirebaseFirestore = FirebaseFi
             Result.failure(e)
         }
     }
+
+    /**
+     * Retrieves all active memberships for a specific user.
+     */
+    suspend fun getMembershipsByUser(userId: String): Result<List<Membership>> {
+        return try {
+            val snapshot = membershipsCollection
+                .whereEqualTo("userId", userId)
+                .whereEqualTo("status", "active")
+                .get()
+                .await()
+            val memberships = snapshot.toObjects(Membership::class.java)
+            Result.success(memberships)
+        } catch (e: Exception) {
+            android.util.Log.e("MembershipRepository", "Error getting user memberships", e)
+            Result.failure(e)
+        }
+    }
 }
