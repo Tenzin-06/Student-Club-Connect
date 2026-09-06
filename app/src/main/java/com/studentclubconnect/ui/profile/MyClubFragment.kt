@@ -72,7 +72,12 @@ class MyClubFragment : Fragment() {
         }
 
         binding.btnManageEvents.setOnClickListener {
-            Toast.makeText(requireContext(), "Event management coming soon", Toast.LENGTH_SHORT).show()
+            currentClubId?.let { id ->
+                parentFragmentManager.beginTransaction()
+                    .replace(com.studentclubconnect.R.id.nav_host_fragment, com.studentclubconnect.ui.events.EventsFragment.newInstance(id))
+                    .addToBackStack(null)
+                    .commit()
+            }
         }
 
         binding.btnManageAnnouncements.setOnClickListener {

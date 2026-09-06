@@ -27,6 +27,7 @@ class EventsFragment : Fragment() {
     private val viewModel: EventViewModel by viewModels()
     private val authViewModel: AuthViewModel by activityViewModels()
     private lateinit var eventAdapter: EventAdapter
+    private var filterClubId: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,13 +41,16 @@ class EventsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
+        filterClubId = arguments?.getString("clubId")
+        
+        setupToolbar()
         setupRecyclerView()
         observeViewModel()
         
-        viewModel.getEvents()
+        loadEvents()
 
         binding.btnRetry.setOnClickListener {
-            viewModel.getEvents()
+            loadEvents()
         }
 
         binding.fabAddEvent.setOnClickListener {
@@ -55,9 +59,31 @@ class EventsFragment : Fragment() {
         }
     }
 
+    private fun setupToolbar() {
+        if (filterClubId != null) {
+            binding.toolbar.isVisible = true
+            binding.toolbar.title = "Manage Events"
+            binding.tvUpcomingEvents.text = "Club Events"
+            binding.toolbar.setNavigationOnClickListener {
+                parentFragmentManager.popBackStack()
+            }
+        } else {
+            binding.toolbar.isVisible = false
+            binding.tvUpcomingEvents.text = "Upcoming Events"
+        }
+    }
+
     override fun onStart() {
         super.onStart()
-        viewModel.getEvents()
+        loadEvents()
+    }
+
+    private fun loadEvents() {
+        if (filterClubId != null) {
+            viewModel.getEventsByClub(filterClubId!!)
+        } else {
+            viewModel.getEvents()
+        }
     }
 
     private fun setupRecyclerView() {
@@ -123,5 +149,15 @@ class EventsFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        fun newInstance(clubId: String? = null): EventsFragment {
+            return EventsFragment().apply {
+                arguments = Bundle().apply {
+                    putString("clubId", clubId)
+                }
+            }
+        }
     }
 }

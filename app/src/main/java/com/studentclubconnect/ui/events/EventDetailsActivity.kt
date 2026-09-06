@@ -86,6 +86,7 @@ class EventDetailsActivity : AppCompatActivity() {
                             if (event != null) {
                                 displayEventDetails(event)
                                 clubViewModel.getClubById(event.clubId)
+                                updateAdminActionsVisibility()
                             } else {
                                 Toast.makeText(this@EventDetailsActivity, "Event not found", Toast.LENGTH_SHORT).show()
                                 finish()
@@ -140,7 +141,7 @@ class EventDetailsActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 authViewModel.userProfile.collect { user ->
-                    binding.adminActionContainer.isVisible = user?.role?.lowercase() == "admin"
+                    updateAdminActionsVisibility()
                 }
             }
         }
@@ -154,6 +155,18 @@ class EventDetailsActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun updateAdminActionsVisibility() {
+        val user = authViewModel.userProfile.value
+        val event = (eventViewModel.eventState.value as? EventState.SingleSuccess)?.event
+        
+        val isAdmin = user?.role?.lowercase() == "admin"
+        val isPresident = user?.role?.lowercase() == "president" && 
+                        event?.clubId == user.presidentOf && 
+                        !event?.clubId.isNullOrEmpty()
+        
+        binding.adminActionContainer.isVisible = isAdmin || isPresident
     }
 
     private fun updateReminderButtonUI() {
