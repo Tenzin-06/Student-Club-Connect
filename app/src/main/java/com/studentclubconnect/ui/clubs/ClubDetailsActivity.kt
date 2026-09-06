@@ -45,16 +45,7 @@ class ClubDetailsActivity : AppCompatActivity() {
 
         setupToolbar()
         setupAnnouncements()
-<<<<<<< HEAD
-        observeViewModels()
-=======
         observeViewModels(clubId)
->>>>>>> feat/role-based-access
-        
-        viewModel.getClubById(clubId)
-        membershipViewModel.checkMembership(clubId)
-        announcementViewModel.getAnnouncementsByClub(clubId)
-        authViewModel.getCurrentUser()?.uid?.let { authViewModel.loadUserProfile(it) }
 
         binding.btnJoinClub.setOnClickListener {
             if (isMember) {
@@ -76,6 +67,15 @@ class ClubDetailsActivity : AppCompatActivity() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        val clubId = intent.getStringExtra("clubId") ?: return
+        viewModel.getClubById(clubId)
+        membershipViewModel.checkMembership(clubId)
+        announcementViewModel.getAnnouncementsByClub(clubId)
+        authViewModel.getCurrentUser()?.uid?.let { authViewModel.loadUserProfile(it) }
+    }
+
     private fun setupToolbar() {
         binding.toolbar.setNavigationOnClickListener {
             onBackPressed()
@@ -90,11 +90,7 @@ class ClubDetailsActivity : AppCompatActivity() {
         }
     }
 
-<<<<<<< HEAD
-    private fun observeViewModels() {
-=======
     private fun observeViewModels(clubId: String) {
->>>>>>> feat/role-based-access
         // Observe Club Details
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -134,13 +130,9 @@ class ClubDetailsActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 authViewModel.userProfile.collect { user ->
-<<<<<<< HEAD
-                    binding.adminActionContainer.isVisible = user?.role?.lowercase() == "admin"
-=======
                     val isAdmin = user?.role?.lowercase() == "admin"
                     val isPresident = user?.role?.lowercase() == "president" && user.presidentOf == clubId
                     binding.adminActionContainer.isVisible = isAdmin || isPresident
->>>>>>> feat/role-based-access
                 }
             }
         }
@@ -228,7 +220,7 @@ class ClubDetailsActivity : AppCompatActivity() {
             tvClubName.text = club.name
             tvClubCategory.text = club.category.ifEmpty { "General" }
             tvClubDescription.text = club.description.ifEmpty { "No description available." }
-            tvPresidentName.text = club.president.ifEmpty { "Information unavailable" }
+            tvPresidentName.text = club.president.ifEmpty { "No President assigned" }
             
             // Image loading would go here (e.g. Glide.with(this).load(club.imageUrl)...)
             // For now it uses the placeholder in XML

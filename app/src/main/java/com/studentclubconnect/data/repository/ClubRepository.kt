@@ -13,20 +13,34 @@ class ClubRepository(private val firestore: FirebaseFirestore = FirebaseFirestor
     private val clubsCollection = firestore.collection("clubs")
 
     /**
-     * Creates a new club in Firestore.
-     * If the club ID is empty, Firestore generates a unique document ID.
+     * Creates a new club in Firestore and assigns the president role.
      */
     suspend fun createClub(club: Club): Result<String> {
         return try {
+            val batch = firestore.batch()
+            
             val docRef = if (club.id.isEmpty()) {
                 clubsCollection.document()
             } else {
                 clubsCollection.document(club.id)
             }
             
-            val clubToSave = club.copy(id = docRef.id)
-            docRef.set(clubToSave).await()
-            Result.success(docRef.id)
+            val clubId = docRef.id
+            val clubToSave = club.copy(id = clubId)
+            
+            batch.set(docRef, clubToSave)
+            
+            // Assign President Role
+            if (club.presidentId.isNotEmpty()) {
+                val userRef = firestore.collection("users").document(club.presidentId)
+                batch.update(userRef, mapOf(
+                    "role" to "president",
+                    "presidentOf" to clubId
+                ))
+            }
+            
+            batch.commit().await()
+            Result.success(clubId)
         } catch (e: Exception) {
             Log.e("ClubRepository", "Error creating club", e)
             Result.failure(e)
@@ -62,14 +76,42 @@ class ClubRepository(private val firestore: FirebaseFirestore = FirebaseFirestor
     }
 
     /**
-     * Updates an existing club's information.
+     * Updates an existing club and handles president reassignment.
      */
     suspend fun updateClub(club: Club): Result<Unit> {
         return try {
             if (club.id.isEmpty()) {
                 return Result.failure(IllegalArgumentException("Club ID cannot be empty for update"))
             }
-            clubsCollection.document(club.id).set(club).await()
+            
+            val batch = firestore.batch()
+            
+            // Get existing club to check if president changed
+            val existingClubDoc = clubsCollection.document(club.id).get().await()
+            val oldPresidentId = existingClubDoc.getString("presidentId") ?: ""
+            
+            // 1. Revert old president if changed
+            if (oldPresidentId.isNotEmpty() && oldPresidentId != club.presidentId) {
+                val oldUserRef = firestore.collection("users").document(oldPresidentId)
+                batch.update(oldUserRef, mapOf(
+                    "role" to "student",
+                    "presidentOf" to null
+                ))
+            }
+            
+            // 2. Assign new president if changed
+            if (club.presidentId.isNotEmpty() && club.presidentId != oldPresidentId) {
+                val newUserRef = firestore.collection("users").document(club.presidentId)
+                batch.update(newUserRef, mapOf(
+                    "role" to "president",
+                    "presidentOf" to club.id
+                ))
+            }
+            
+            // 3. Update club info
+            batch.set(clubsCollection.document(club.id), club)
+            
+            batch.commit().await()
             Result.success(Unit)
         } catch (e: Exception) {
             Log.e("ClubRepository", "Error updating club: ${club.id}", e)
@@ -78,11 +120,29 @@ class ClubRepository(private val firestore: FirebaseFirestore = FirebaseFirestor
     }
 
     /**
-     * Deletes a club by its ID.
+     * Deletes a club and reverts the president's role.
      */
     suspend fun deleteClub(id: String): Result<Unit> {
         return try {
-            clubsCollection.document(id).delete().await()
+            val batch = firestore.batch()
+            
+            // Get current president info before deleting
+            val clubDoc = clubsCollection.document(id).get().await()
+            val presidentId = clubDoc.getString("presidentId") ?: ""
+            
+            // 1. Delete the club
+            batch.delete(clubsCollection.document(id))
+            
+            // 2. Revert president role
+            if (presidentId.isNotEmpty()) {
+                val userRef = firestore.collection("users").document(presidentId)
+                batch.update(userRef, mapOf(
+                    "role" to "student",
+                    "presidentOf" to null
+                ))
+            }
+            
+            batch.commit().await()
             Result.success(Unit)
         } catch (e: Exception) {
             Log.e("ClubRepository", "Error deleting club: $id", e)

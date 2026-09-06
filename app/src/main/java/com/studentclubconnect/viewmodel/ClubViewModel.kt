@@ -3,7 +3,9 @@ package com.studentclubconnect.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.studentclubconnect.data.model.Club
+import com.studentclubconnect.data.model.User
 import com.studentclubconnect.data.repository.ClubRepository
+import com.studentclubconnect.data.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,6 +18,7 @@ sealed class ClubState {
     object Idle : ClubState()
     object Loading : ClubState()
     data class Success(val clubs: List<Club>) : ClubState()
+    data class StudentsLoaded(val students: List<User>) : ClubState()
     data class SingleSuccess(val club: Club?) : ClubState()
     data class ActionSuccess(val message: String) : ClubState()
     object Empty : ClubState()
@@ -28,6 +31,7 @@ sealed class ClubState {
 class ClubViewModel : ViewModel() {
 
     private val repository: ClubRepository = ClubRepository()
+    private val userRepository: UserRepository = UserRepository()
     
     private val _clubState = MutableStateFlow<ClubState>(ClubState.Idle)
     val clubState: StateFlow<ClubState> = _clubState.asStateFlow()
@@ -129,5 +133,23 @@ class ClubViewModel : ViewModel() {
      */
     fun resetState() {
         _clubState.value = ClubState.Idle
+    }
+
+    /**
+     * Fetches users eligible to become club presidents.
+     */
+    fun getEligibleStudents() {
+        viewModelScope.launch {
+            _clubState.value = ClubState.Loading
+            val result = userRepository.getEligibleStudents()
+            result.fold(
+                onSuccess = { students ->
+                    _clubState.value = ClubState.StudentsLoaded(students)
+                },
+                onFailure = { error ->
+                    _clubState.value = ClubState.Error(error.message ?: "Failed to load students")
+                }
+            )
+        }
     }
 }
