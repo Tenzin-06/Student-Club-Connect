@@ -79,4 +79,21 @@ class MembershipRepository(private val firestore: FirebaseFirestore = FirebaseFi
             Result.failure(e)
         }
     }
+
+    /**
+     * Retrieves the number of active members in a specific club.
+     */
+    suspend fun getMembersCountByClub(clubId: String): Result<Int> {
+        return try {
+            val snapshot = membershipsCollection
+                .whereEqualTo("clubId", clubId)
+                .whereEqualTo("status", "active")
+                .get()
+                .await()
+            Result.success(snapshot.size())
+        } catch (e: Exception) {
+            android.util.Log.e("MembershipRepository", "Error getting club members count", e)
+            Result.failure(e)
+        }
+    }
 }
