@@ -62,4 +62,35 @@ class UserRepository(private val firestore: FirebaseFirestore = FirebaseFirestor
             Result.failure(e)
         }
     }
+
+    /**
+     * Retrieves multiple user profiles by their UIDs.
+     * Uses whereIn which supports up to 30 IDs per query.
+     */
+    suspend fun getUsersByUids(uids: List<String>): Result<List<User>> {
+        if (uids.isEmpty()) return Result.success(emptyList())
+        
+        return try {
+            val allUsers = mutableListOf<User>()
+            
+            for (uid in uids) {
+                try {
+                    val doc = firestore.collection("users").document(uid).get().await()
+                    if (doc.exists()) {
+                        val user = doc.toObject(User::class.java)
+                        if (user != null) {
+                            allUsers.add(user)
+                        }
+                    }
+                } catch (e: Exception) {
+                    android.util.Log.e("UserRepository", "Error reading user document $uid", e)
+                }
+            }
+            
+            Result.success(allUsers)
+        } catch (e: Exception) {
+            android.util.Log.e("UserRepository", "Failed to get users by UIDs", e)
+            Result.failure(e)
+        }
+    }
 }
