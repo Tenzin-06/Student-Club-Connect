@@ -13,6 +13,7 @@ data class User(
     val phone: String = "",
     val profileImage: String = "",
     val role: String = "student",
+    val presidentOf: String? = null,
     @ServerTimestamp
     val createdAt: java.util.Date? = null
 )
