@@ -81,6 +81,13 @@ class ProfileFragment : Fragment() {
             }
         }
 
+        binding.btnAdminDashboard.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.nav_host_fragment, AdminDashboardFragment())
+                .addToBackStack(null)
+                .commit()
+        }
+
         binding.btnEditProfileItem.setOnClickListener {
             toggleEditMode(true)
         }
@@ -150,6 +157,11 @@ class ProfileFragment : Fragment() {
         val isPresident = user.role.lowercase() == "president" && !user.presidentOf.isNullOrEmpty()
         binding.btnMyClubDashboard.isVisible = isPresident
         binding.dividerMyClub.isVisible = isPresident
+
+        // Handle Admin Dashboard visibility
+        val isAdmin = user.role.lowercase() == "admin"
+        binding.btnAdminDashboard.isVisible = isAdmin
+        binding.dividerAdminDashboard.isVisible = isAdmin
 
         android.util.Log.d("ProfileFragment", "Displaying profile for: ${user.name}, ID: ${user.studentId}")
         binding.tvProfileName.text = user.name.ifEmpty { "Student Name" }
