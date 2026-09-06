@@ -158,6 +158,15 @@ class AddEditEventActivity : AppCompatActivity() {
                                 "admin" -> state.clubs
                                 else -> emptyList()
                             }
+                            
+                            // Disable club selection for presidents
+                            if (userRole == "president") {
+                                binding.tilClub.isEnabled = false
+                                binding.actvClub.isEnabled = false
+                            } else {
+                                binding.tilClub.isEnabled = true
+                                binding.actvClub.isEnabled = true
+                            }
 
                             val clubNames = clubsList.map { it.name }
                             val adapter = ArrayAdapter(this@AddEditEventActivity, android.R.layout.simple_dropdown_item_1line, clubNames)
