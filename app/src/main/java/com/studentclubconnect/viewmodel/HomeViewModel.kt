@@ -2,9 +2,11 @@ package com.studentclubconnect.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.studentclubconnect.data.model.Announcement
 import com.studentclubconnect.data.model.Club
 import com.studentclubconnect.data.model.Event
 import com.studentclubconnect.data.model.User
+import com.studentclubconnect.data.repository.AnnouncementRepository
 import com.studentclubconnect.data.repository.ClubRepository
 import com.studentclubconnect.data.repository.EventRepository
 import com.studentclubconnect.data.repository.MembershipRepository
@@ -21,7 +23,8 @@ sealed class HomeState {
         val upcomingEvents: List<Event>,
         val joinedClubs: List<Club>,
         val popularClubs: List<Club> = emptyList(),
-        val announcements: List<String> = emptyList() // Placeholder
+        val announcements: List<Announcement> = emptyList(),
+        val clubNames: Map<String, String> = emptyMap()
     ) : HomeState()
     data class Error(val message: String) : HomeState()
 }
@@ -32,6 +35,7 @@ class HomeViewModel : ViewModel() {
     private val eventRepository = EventRepository()
     private val membershipRepository = MembershipRepository()
     private val userRepository = UserRepository()
+    private val announcementRepository = AnnouncementRepository()
 
     private val _homeState = MutableStateFlow<HomeState>(HomeState.Loading)
     val homeState: StateFlow<HomeState> = _homeState.asStateFlow()
@@ -64,11 +68,24 @@ class HomeViewModel : ViewModel() {
                 val popularClubsResult = clubRepository.getAllClubs()
                 val popularClubs = popularClubsResult.getOrDefault(emptyList()).take(3)
 
+                // 5. Fetch Recent Announcements
+                val announcementsResult = announcementRepository.getAllAnnouncements()
+                val announcements = announcementsResult.getOrDefault(emptyList())
+                    .sortedByDescending { it.createdAt }
+                    .take(5)
+
+                // 6. Resolve Club Names for Announcements and Events if needed
+                // For efficiency, fetch all clubs and create a map
+                val allClubsResult = clubRepository.getAllClubs()
+                val clubNames = allClubsResult.getOrDefault(emptyList()).associate { it.id to it.name }
+
                 _homeState.value = HomeState.Success(
                     user = user,
                     upcomingEvents = upcomingEvents,
                     joinedClubs = joinedClubs,
-                    popularClubs = popularClubs
+                    popularClubs = popularClubs,
+                    announcements = announcements,
+                    clubNames = clubNames
                 )
             } catch (e: Exception) {
                 _homeState.value = HomeState.Error("Unable to load information. Please try again.")

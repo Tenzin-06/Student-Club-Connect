@@ -126,6 +126,46 @@
                 app:layout_constraintTop_toBottomOf="@id/tvPresidentHeading"
                 tools:text="John Doe" />
 
+            <TextView
+                android:id="@+id/tvAnnouncementsHeading"
+                style="@style/Typography.SubHeading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="Announcements"
+                android:textStyle="bold"
+                app:layout_constraintTop_toBottomOf="@id/tvPresidentName" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvAnnouncements"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:nestedScrollingEnabled="false"
+                app:layout_constraintTop_toBottomOf="@id/tvAnnouncementsHeading"
+                tools:listitem="@layout/item_announcement" />
+
+            <ProgressBar
+                android:id="@+id/pbAnnouncements"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvAnnouncementsHeading" />
+
+            <TextView
+                android:id="@+id/tvNoAnnouncements"
+                style="@style/Typography.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:text="No announcements yet."
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/tvAnnouncementsHeading" />
+
             <LinearLayout
                 android:id="@+id/adminActionContainer"
                 android:layout_width="match_parent"
@@ -133,7 +173,7 @@
                 android:layout_marginTop="32dp"
                 android:orientation="vertical"
                 android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@id/tvPresidentName"
+                app:layout_constraintTop_toBottomOf="@id/rvAnnouncements"
                 tools:visibility="visible">
 
                 <View
