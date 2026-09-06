@@ -1,18 +1,169 @@
 package com.studentclubconnect.ui.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import com.studentclubconnect.databinding.FragmentPlaceholderBinding
-
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
 import com.studentclubconnect.R
+import com.studentclubconnect.databinding.FragmentHomeBinding
+import com.studentclubconnect.ui.clubs.ClubAdapter
+import com.studentclubconnect.ui.clubs.ClubDetailsActivity
+import com.studentclubconnect.ui.events.EventAdapter
+import com.studentclubconnect.ui.events.EventDetailsActivity
+import com.studentclubconnect.viewmodel.HomeState
+import com.studentclubconnect.viewmodel.HomeViewModel
+import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val view = inflater.inflate(R.layout.fragment_placeholder, container, false)
-        view.findViewById<android.widget.TextView>(R.id.tvPlaceholder).text = "Home Screen"
-        return view
+
+    private var _binding: FragmentHomeBinding? = null
+    private val binding get() = _binding!!
+    private val viewModel: HomeViewModel by viewModels()
+    
+    private lateinit var eventAdapter: EventAdapter
+    private lateinit var clubAdapter: ClubAdapter
+    private lateinit var popularClubAdapter: ClubAdapter
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        
+        setupRecyclerViews()
+        setupListeners()
+        observeViewModel()
+        
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId != null) {
+            viewModel.loadHomeData(userId)
+        }
+    }
+
+    private fun setupRecyclerViews() {
+        // Upcoming Events
+        eventAdapter = EventAdapter { event ->
+            val intent = Intent(requireContext(), EventDetailsActivity::class.java).apply {
+                putExtra("eventId", event.id)
+            }
+            startActivity(intent)
+        }
+        binding.rvUpcomingEvents.apply {
+            adapter = eventAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+        }
+
+        // My Clubs
+        clubAdapter = ClubAdapter { club ->
+            val intent = Intent(requireContext(), ClubDetailsActivity::class.java).apply {
+                putExtra("clubId", club.id)
+            }
+            startActivity(intent)
+        }
+        binding.rvMyClubs.apply {
+            adapter = clubAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+        }
+
+        // Popular Clubs
+        popularClubAdapter = ClubAdapter { club ->
+            val intent = Intent(requireContext(), ClubDetailsActivity::class.java).apply {
+                putExtra("clubId", club.id)
+            }
+            startActivity(intent)
+        }
+        binding.rvPopularClubs.apply {
+            adapter = popularClubAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+        }
+    }
+
+    private fun setupListeners() {
+        binding.btnViewAllEvents.setOnClickListener {
+            navigateToTab(R.id.nav_events)
+        }
+        binding.btnViewAllClubs.setOnClickListener {
+            navigateToTab(R.id.nav_clubs)
+        }
+    }
+
+    private fun navigateToTab(tabId: Int) {
+        val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        bottomNav.selectedItemId = tabId
+    }
+
+    private fun observeViewModel() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.homeState.collect { state ->
+                    when (state) {
+                        is HomeState.Loading -> {
+                            binding.progressBar.isVisible = true
+                        }
+                        is HomeState.Success -> {
+                            binding.progressBar.isVisible = false
+                            
+                            // Welcome Message
+                            val userName = state.user?.name ?: "Student"
+                            binding.tvGreeting.text = "Hello, $userName 👋"
+                            
+                            // Popular Clubs
+                            if (state.popularClubs.isEmpty()) {
+                                binding.rvPopularClubs.isVisible = false
+                            } else {
+                                binding.rvPopularClubs.isVisible = true
+                                popularClubAdapter.submitList(state.popularClubs)
+                            }
+                            
+                            // Upcoming Events
+                            if (state.upcomingEvents.isEmpty()) {
+                                binding.rvUpcomingEvents.isVisible = false
+                                binding.tvNoEvents.isVisible = true
+                            } else {
+                                binding.rvUpcomingEvents.isVisible = true
+                                binding.tvNoEvents.isVisible = false
+                                eventAdapter.submitList(state.upcomingEvents)
+                            }
+                            
+                            // My Clubs
+                            if (state.joinedClubs.isEmpty()) {
+                                binding.rvMyClubs.isVisible = false
+                                binding.tvNoClubs.isVisible = true
+                            } else {
+                                binding.rvMyClubs.isVisible = true
+                                binding.tvNoClubs.isVisible = false
+                                clubAdapter.submitList(state.joinedClubs)
+                            }
+                        }
+                        is HomeState.Error -> {
+                            binding.progressBar.isVisible = false
+                            Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
