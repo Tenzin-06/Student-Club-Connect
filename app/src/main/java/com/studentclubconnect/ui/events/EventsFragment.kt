@@ -28,6 +28,7 @@ class EventsFragment : Fragment() {
     private val authViewModel: AuthViewModel by activityViewModels()
     private lateinit var eventAdapter: EventAdapter
     private var filterClubId: String? = null
+    private var isManagementMode: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,6 +43,7 @@ class EventsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         
         filterClubId = arguments?.getString("clubId")
+        isManagementMode = arguments?.getBoolean("managementMode", false) ?: false
         
         setupToolbar()
         setupRecyclerView()
@@ -60,10 +62,10 @@ class EventsFragment : Fragment() {
     }
 
     private fun setupToolbar() {
-        if (filterClubId != null) {
+        if (filterClubId != null || isManagementMode) {
             binding.toolbar.isVisible = true
             binding.toolbar.title = "Manage Events"
-            binding.tvUpcomingEvents.text = "Club Events"
+            binding.tvUpcomingEvents.text = if (filterClubId != null) "Club Events" else "All Events"
             binding.toolbar.setNavigationOnClickListener {
                 parentFragmentManager.popBackStack()
             }
@@ -152,10 +154,11 @@ class EventsFragment : Fragment() {
     }
 
     companion object {
-        fun newInstance(clubId: String? = null): EventsFragment {
+        fun newInstance(clubId: String? = null, managementMode: Boolean = false): EventsFragment {
             return EventsFragment().apply {
                 arguments = Bundle().apply {
                     putString("clubId", clubId)
+                    putBoolean("managementMode", managementMode)
                 }
             }
         }

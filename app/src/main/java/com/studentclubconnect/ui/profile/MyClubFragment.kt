@@ -74,7 +74,7 @@ class MyClubFragment : Fragment() {
         binding.btnManageEvents.setOnClickListener {
             currentClubId?.let { id ->
                 parentFragmentManager.beginTransaction()
-                    .replace(com.studentclubconnect.R.id.nav_host_fragment, com.studentclubconnect.ui.events.EventsFragment.newInstance(id))
+                    .replace(com.studentclubconnect.R.id.nav_host_fragment, com.studentclubconnect.ui.events.EventsFragment.newInstance(id, true))
                     .addToBackStack(null)
                     .commit()
             }

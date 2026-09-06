@@ -54,22 +54,31 @@ class AdminDashboardFragment : Fragment() {
 
     private fun setupListeners() {
         binding.btnManageClubs.setOnClickListener {
-            // Already implemented via bottom nav, but can navigate specifically if needed
-            Toast.makeText(requireContext(), "Use Clubs tab for management", Toast.LENGTH_SHORT).show()
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.nav_host_fragment, com.studentclubconnect.ui.clubs.ClubsFragment.newInstance(true))
+                .addToBackStack(null)
+                .commit()
         }
 
         binding.btnManageEvents.setOnClickListener {
-            // Already implemented via bottom nav
-            Toast.makeText(requireContext(), "Use Events tab for management", Toast.LENGTH_SHORT).show()
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.nav_host_fragment, com.studentclubconnect.ui.events.EventsFragment.newInstance(null, true))
+                .addToBackStack(null)
+                .commit()
         }
 
         binding.btnManageAnnouncements.setOnClickListener {
-            // Future feature: Global announcements list for admin
-            Toast.makeText(requireContext(), "Global announcement management coming soon", Toast.LENGTH_SHORT).show()
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.nav_host_fragment, ManageAnnouncementsFragment.newInstance(null))
+                .addToBackStack(null)
+                .commit()
         }
 
         binding.btnManageUsers.setOnClickListener {
-            Toast.makeText(requireContext(), "User management coming soon", Toast.LENGTH_SHORT).show()
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.nav_host_fragment, ManageUsersFragment())
+                .addToBackStack(null)
+                .commit()
         }
     }
 

@@ -22,6 +22,8 @@ import com.studentclubconnect.ui.clubs.AnnouncementAdapter
 import com.studentclubconnect.viewmodel.AnnouncementState
 import com.studentclubconnect.viewmodel.AnnouncementViewModel
 import com.studentclubconnect.viewmodel.AuthViewModel
+import com.studentclubconnect.viewmodel.ClubState
+import com.studentclubconnect.viewmodel.ClubViewModel
 import kotlinx.coroutines.launch
 
 class ManageAnnouncementsFragment : Fragment() {
@@ -30,6 +32,7 @@ class ManageAnnouncementsFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: AnnouncementViewModel by viewModels()
     private val authViewModel: AuthViewModel by activityViewModels()
+    private val clubViewModel: ClubViewModel by viewModels()
     private var clubId: String? = null
     private lateinit var announcementAdapter: AnnouncementAdapter
 
@@ -46,32 +49,42 @@ class ManageAnnouncementsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         
         clubId = arguments?.getString("clubId")
-        if (clubId == null) {
-            Toast.makeText(requireContext(), "Club ID missing", Toast.LENGTH_SHORT).show()
-            parentFragmentManager.popBackStack()
-            return
-        }
-
+        
         setupToolbar()
         setupRecyclerView()
         observeViewModel()
 
         binding.fabAddAnnouncement.setOnClickListener {
             val intent = Intent(requireContext(), AddEditAnnouncementActivity::class.java).apply {
-                putExtra("clubId", clubId)
+                if (clubId != null) {
+                    putExtra("clubId", clubId)
+                }
             }
             startActivity(intent)
         }
+        
+        clubViewModel.getClubs()
     }
 
     override fun onStart() {
         super.onStart()
-        clubId?.let { viewModel.getAnnouncementsByClub(it) }
+        loadAnnouncements()
+    }
+
+    private fun loadAnnouncements() {
+        if (clubId != null) {
+            viewModel.getAnnouncementsByClub(clubId!!)
+        } else {
+            viewModel.getAnnouncements()
+        }
     }
 
     private fun setupToolbar() {
         binding.toolbar.setNavigationOnClickListener {
             parentFragmentManager.popBackStack()
+        }
+        if (clubId == null) {
+            binding.toolbar.title = "Global Announcements"
         }
     }
 
@@ -135,12 +148,21 @@ class ManageAnnouncementsFragment : Fragment() {
                             }
                             is AnnouncementState.ActionSuccess -> {
                                 Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
-                                clubId?.let { viewModel.getAnnouncementsByClub(it) }
+                                loadAnnouncements()
                             }
                             is AnnouncementState.Error -> {
                                 Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
                             }
                             else -> {}
+                        }
+                    }
+                }
+
+                launch {
+                    clubViewModel.clubState.collect { state ->
+                        if (state is ClubState.Success) {
+                            val clubMap = state.clubs.associate { it.id to it.name }
+                            announcementAdapter.setClubNames(clubMap)
                         }
                     }
                 }
@@ -154,7 +176,7 @@ class ManageAnnouncementsFragment : Fragment() {
     }
 
     companion object {
-        fun newInstance(clubId: String): ManageAnnouncementsFragment {
+        fun newInstance(clubId: String? = null): ManageAnnouncementsFragment {
             return ManageAnnouncementsFragment().apply {
                 arguments = Bundle().apply {
                     putString("clubId", clubId)

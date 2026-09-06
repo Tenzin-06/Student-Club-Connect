@@ -33,6 +33,7 @@ class ClubsFragment : Fragment() {
     private var allClubs: List<Club> = emptyList()
     private var currentCategory: String = "All"
     private var currentSearchQuery: String = ""
+    private var isManagementMode: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,6 +47,9 @@ class ClubsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
+        isManagementMode = arguments?.getBoolean("managementMode", false) ?: false
+        
+        setupToolbar()
         setupRecyclerView()
         setupFilters()
         setupSearch()
@@ -58,6 +62,19 @@ class ClubsFragment : Fragment() {
         binding.fabAddClub.setOnClickListener {
             val intent = android.content.Intent(requireContext(), AddEditClubActivity::class.java)
             startActivity(intent)
+        }
+    }
+
+    private fun setupToolbar() {
+        if (isManagementMode) {
+            binding.toolbar.isVisible = true
+            binding.tvExploreClubs.text = "All Clubs"
+            binding.toolbar.setNavigationOnClickListener {
+                parentFragmentManager.popBackStack()
+            }
+        } else {
+            binding.toolbar.isVisible = false
+            binding.tvExploreClubs.text = "Explore Clubs"
         }
     }
 
@@ -175,5 +192,15 @@ class ClubsFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        fun newInstance(managementMode: Boolean = false): ClubsFragment {
+            return ClubsFragment().apply {
+                arguments = Bundle().apply {
+                    putBoolean("managementMode", managementMode)
+                }
+            }
+        }
     }
 }
