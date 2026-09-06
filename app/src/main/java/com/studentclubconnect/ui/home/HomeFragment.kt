@@ -17,6 +17,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.studentclubconnect.R
 import com.studentclubconnect.databinding.FragmentHomeBinding
+import com.studentclubconnect.ui.clubs.AnnouncementAdapter
 import com.studentclubconnect.ui.clubs.ClubAdapter
 import com.studentclubconnect.ui.clubs.ClubDetailsActivity
 import com.studentclubconnect.ui.events.EventAdapter
@@ -34,6 +35,7 @@ class HomeFragment : Fragment() {
     private lateinit var eventAdapter: EventAdapter
     private lateinit var clubAdapter: ClubAdapter
     private lateinit var popularClubAdapter: ClubAdapter
+    private lateinit var announcementAdapter: AnnouncementAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -93,6 +95,13 @@ class HomeFragment : Fragment() {
             adapter = popularClubAdapter
             layoutManager = LinearLayoutManager(requireContext())
         }
+
+        // Recent Announcements
+        announcementAdapter = AnnouncementAdapter()
+        binding.rvRecentAnnouncements.apply {
+            adapter = announcementAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+        }
     }
 
     private fun setupListeners() {
@@ -116,6 +125,9 @@ class HomeFragment : Fragment() {
                     when (state) {
                         is HomeState.Loading -> {
                             binding.progressBar.isVisible = true
+                            binding.cardNoAnnouncements.isVisible = false
+                            binding.cardNoEvents.isVisible = false
+                            binding.cardNoClubs.isVisible = false
                         }
                         is HomeState.Success -> {
                             binding.progressBar.isVisible = false
@@ -127,28 +139,41 @@ class HomeFragment : Fragment() {
                             // Popular Clubs
                             if (state.popularClubs.isEmpty()) {
                                 binding.rvPopularClubs.isVisible = false
+                                binding.tvPopularClubsLabel.isVisible = false
                             } else {
                                 binding.rvPopularClubs.isVisible = true
+                                binding.tvPopularClubsLabel.isVisible = true
                                 popularClubAdapter.submitList(state.popularClubs)
+                            }
+                            
+                            // Recent Announcements
+                            if (state.announcements.isEmpty()) {
+                                binding.rvRecentAnnouncements.isVisible = false
+                                binding.cardNoAnnouncements.isVisible = true
+                            } else {
+                                binding.rvRecentAnnouncements.isVisible = true
+                                binding.cardNoAnnouncements.isVisible = false
+                                announcementAdapter.setClubNames(state.clubNames)
+                                announcementAdapter.submitList(state.announcements)
                             }
                             
                             // Upcoming Events
                             if (state.upcomingEvents.isEmpty()) {
                                 binding.rvUpcomingEvents.isVisible = false
-                                binding.tvNoEvents.isVisible = true
+                                binding.cardNoEvents.isVisible = true
                             } else {
                                 binding.rvUpcomingEvents.isVisible = true
-                                binding.tvNoEvents.isVisible = false
+                                binding.cardNoEvents.isVisible = false
                                 eventAdapter.submitList(state.upcomingEvents)
                             }
                             
                             // My Clubs
                             if (state.joinedClubs.isEmpty()) {
                                 binding.rvMyClubs.isVisible = false
-                                binding.tvNoClubs.isVisible = true
+                                binding.cardNoClubs.isVisible = true
                             } else {
                                 binding.rvMyClubs.isVisible = true
-                                binding.tvNoClubs.isVisible = false
+                                binding.cardNoClubs.isVisible = false
                                 clubAdapter.submitList(state.joinedClubs)
                             }
                         }

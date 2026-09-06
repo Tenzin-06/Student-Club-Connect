@@ -15,6 +15,8 @@ import com.studentclubconnect.viewmodel.ClubState
 import com.studentclubconnect.viewmodel.ClubViewModel
 import com.studentclubconnect.viewmodel.MembershipState
 import com.studentclubconnect.viewmodel.MembershipViewModel
+import com.studentclubconnect.viewmodel.AnnouncementState
+import com.studentclubconnect.viewmodel.AnnouncementViewModel
 import kotlinx.coroutines.launch
 
 class ClubDetailsActivity : AppCompatActivity() {
@@ -23,7 +25,9 @@ class ClubDetailsActivity : AppCompatActivity() {
     private val viewModel: ClubViewModel by viewModels()
     private val membershipViewModel: MembershipViewModel by viewModels()
     private val authViewModel: AuthViewModel by viewModels()
+    private val announcementViewModel: AnnouncementViewModel by viewModels()
 
+    private lateinit var announcementAdapter: AnnouncementAdapter
     private var isMember = false
     private var currentClub: com.studentclubconnect.data.model.Club? = null
 
@@ -40,10 +44,12 @@ class ClubDetailsActivity : AppCompatActivity() {
         }
 
         setupToolbar()
-        observeViewModels(clubId)
+        setupAnnouncements()
+        observeViewModels()
         
         viewModel.getClubById(clubId)
         membershipViewModel.checkMembership(clubId)
+        announcementViewModel.getAnnouncementsByClub(clubId)
         authViewModel.getCurrentUser()?.uid?.let { authViewModel.loadUserProfile(it) }
 
         binding.btnJoinClub.setOnClickListener {
@@ -72,7 +78,15 @@ class ClubDetailsActivity : AppCompatActivity() {
         }
     }
 
-    private fun observeViewModels(clubId: String) {
+    private fun setupAnnouncements() {
+        announcementAdapter = AnnouncementAdapter()
+        binding.rvAnnouncements.apply {
+            adapter = announcementAdapter
+            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this@ClubDetailsActivity)
+        }
+    }
+
+    private fun observeViewModels() {
         // Observe Club Details
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -84,7 +98,11 @@ class ClubDetailsActivity : AppCompatActivity() {
                         is ClubState.SingleSuccess -> {
                             binding.progressBar.isVisible = false
                             currentClub = state.club
-                            state.club?.let { displayClub(it) } ?: run {
+                            state.club?.let { 
+                                displayClub(it)
+                                // Provide club name to announcement adapter
+                                announcementAdapter.setClubNames(mapOf(it.id to it.name))
+                            } ?: run {
                                 Toast.makeText(this@ClubDetailsActivity, "Club not found.", Toast.LENGTH_SHORT).show()
                                 finish()
                             }
@@ -139,6 +157,35 @@ class ClubDetailsActivity : AppCompatActivity() {
                         is MembershipState.AuthExpired -> {
                             Toast.makeText(this@ClubDetailsActivity, "Authentication expired. Please log in again.", Toast.LENGTH_LONG).show()
                             // In a real app, redirect to login
+                        }
+                        else -> {}
+                    }
+                }
+            }
+        }
+
+        // Observe Announcements
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                announcementViewModel.announcementState.collect { state ->
+                    when (state) {
+                        is AnnouncementState.Loading -> {
+                            binding.pbAnnouncements.isVisible = true
+                            binding.tvNoAnnouncements.isVisible = false
+                        }
+                        is AnnouncementState.Success -> {
+                            binding.pbAnnouncements.isVisible = false
+                            binding.tvNoAnnouncements.isVisible = false
+                            announcementAdapter.submitList(state.announcements)
+                        }
+                        is AnnouncementState.Empty -> {
+                            binding.pbAnnouncements.isVisible = false
+                            binding.tvNoAnnouncements.isVisible = true
+                            announcementAdapter.submitList(emptyList())
+                        }
+                        is AnnouncementState.Error -> {
+                            binding.pbAnnouncements.isVisible = false
+                            Toast.makeText(this@ClubDetailsActivity, state.message, Toast.LENGTH_SHORT).show()
                         }
                         else -> {}
                     }
