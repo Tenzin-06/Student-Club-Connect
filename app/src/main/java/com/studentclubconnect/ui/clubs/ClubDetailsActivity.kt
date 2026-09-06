@@ -83,11 +83,39 @@ class ClubDetailsActivity : AppCompatActivity() {
     }
 
     private fun setupAnnouncements() {
-        announcementAdapter = AnnouncementAdapter()
+        val user = authViewModel.userProfile.value
+        announcementAdapter = AnnouncementAdapter(
+            currentUserId = user?.uid,
+            currentUserRole = user?.role,
+            userPresidentOf = user?.presidentOf,
+            onEditClick = { announcement ->
+                val intent = android.content.Intent(this, AddEditAnnouncementActivity::class.java).apply {
+                    putExtra("announcementId", announcement.id)
+                    putExtra("clubId", announcement.clubId)
+                    putExtra("title", announcement.title)
+                    putExtra("message", announcement.message)
+                }
+                startActivity(intent)
+            },
+            onDeleteClick = { announcement ->
+                showDeleteAnnouncementConfirmation(announcement.id)
+            }
+        )
         binding.rvAnnouncements.apply {
             adapter = announcementAdapter
             layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this@ClubDetailsActivity)
         }
+    }
+
+    private fun showDeleteAnnouncementConfirmation(announcementId: String) {
+        AlertDialog.Builder(this)
+            .setTitle("Delete Announcement")
+            .setMessage("Are you sure you want to delete this announcement?")
+            .setPositiveButton("Delete") { _, _ ->
+                announcementViewModel.deleteAnnouncement(announcementId)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun observeViewModels(clubId: String) {
@@ -133,6 +161,9 @@ class ClubDetailsActivity : AppCompatActivity() {
                     val isAdmin = user?.role?.lowercase() == "admin"
                     val isPresident = user?.role?.lowercase() == "president" && user.presidentOf == clubId
                     binding.adminActionContainer.isVisible = isAdmin || isPresident
+                    
+                    // Refresh announcements adapter with new user info
+                    setupAnnouncements()
                 }
             }
         }
