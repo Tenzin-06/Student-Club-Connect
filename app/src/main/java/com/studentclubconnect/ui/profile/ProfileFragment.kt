@@ -20,6 +20,7 @@ import com.studentclubconnect.data.model.User
 import com.studentclubconnect.databinding.FragmentProfileBinding
 import com.studentclubconnect.viewmodel.ProfileState
 import com.studentclubconnect.viewmodel.ProfileViewModel
+import coil.load
 import kotlinx.coroutines.launch
 
 class ProfileFragment : Fragment() {
@@ -171,6 +172,13 @@ class ProfileFragment : Fragment() {
         binding.tvProfileSemester.text = user.semester.toString()
         binding.tvProfileEmail.text = user.email
         binding.tvProfilePhone.text = user.phone.ifEmpty { "Not provided" }
+        
+        // Load profile picture
+        binding.ivProfilePicture.load(user.profileImage) {
+            crossfade(true)
+            placeholder(R.drawable.ic_profile_placeholder)
+            error(R.drawable.ic_profile_placeholder)
+        }
         
         // Populate edit fields
         binding.etProfileName.setText(user.name)

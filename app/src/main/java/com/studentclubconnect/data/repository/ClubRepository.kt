@@ -3,6 +3,9 @@ package com.studentclubconnect.data.repository
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.studentclubconnect.data.model.Club
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 /**
@@ -59,6 +62,22 @@ class ClubRepository(private val firestore: FirebaseFirestore = FirebaseFirestor
             Log.e("ClubRepository", "Error getting all clubs", e)
             Result.failure(e)
         }
+    }
+
+    /**
+     * Retrieves all clubs as a Flow for real-time updates.
+     */
+    fun getAllClubsFlow(): Flow<List<Club>> = callbackFlow {
+        val listener = clubsCollection.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                close(error)
+                return@addSnapshotListener
+            }
+            if (snapshot != null) {
+                trySend(snapshot.toObjects(Club::class.java))
+            }
+        }
+        awaitClose { listener.remove() }
     }
 
     /**

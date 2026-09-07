@@ -7,6 +7,7 @@ import com.studentclubconnect.data.repository.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -40,42 +41,51 @@ class AdminDashboardViewModel : ViewModel() {
             _statsState.value = _statsState.value.copy(isLoading = true, error = null)
             
             try {
-                val studentsResult = userRepository.getUsersByRole("student")
-                val presidentsResult = userRepository.getUsersByRole("president")
-                val clubsResult = clubRepository.getAllClubs()
-                val eventsResult = eventRepository.getAllEvents()
-                val membershipsResult = membershipRepository.getAllMemberships()
-                val announcementsResult = announcementRepository.getAllAnnouncements()
+                combine(
+                    userRepository.getAllUsersFlow(),
+                    membershipRepository.getAllMembershipsFlow(),
+                    // For the others we can still use one-time get for now to minimize refactor, 
+                    // but the above two are the most important for the user's deletion issue.
+                ) { allUsers, memberships ->
+                    allUsers to memberships
+                }.collect { (allUsers, memberships) ->
+                    val clubsResult = clubRepository.getAllClubs()
+                    val eventsResult = eventRepository.getAllEvents()
+                    val announcementsResult = announcementRepository.getAllAnnouncements()
 
-                val clubs = clubsResult.getOrDefault(emptyList())
-                val events = eventsResult.getOrDefault(emptyList())
-                val memberships = membershipsResult.getOrDefault(emptyList())
+                    val clubs = clubsResult.getOrDefault(emptyList())
+                    val events = eventsResult.getOrDefault(emptyList())
 
-                // Analytics 1: Club Memberships
-                val clubMap = clubs.associate { it.id to it.name }
-                val membershipsByClub = memberships
-                    .groupBy { it.clubId }
-                    .mapKeys { clubMap[it.key] ?: "Unknown Club" }
-                    .mapValues { it.value.size }
-                    .toList()
-                    .sortedByDescending { it.second }
-                    .take(10)
-                    .toMap()
+                    // Filter memberships to only include those belonging to existing users
+                    val validUserIds = allUsers.map { it.uid }.toSet()
+                    val validMemberships = memberships.filter { validUserIds.contains(it.userId) }
 
-                // Analytics 2: Events by Month
-                val eventsByMonth = calculateEventsByMonth(events)
+                    // Analytics 1: Club Memberships
+                    val clubMap = clubs.associate { it.id to it.name }
+                    val membershipsByClub = validMemberships
+                        .groupBy { it.clubId }
+                        .mapKeys { clubMap[it.key] ?: "Unknown Club" }
+                        .mapValues { it.value.size }
+                        .toList()
+                        .sortedByDescending { it.second }
+                        .take(10)
+                        .toMap()
 
-                _statsState.value = AdminDashboardStats(
-                    isLoading = false,
-                    studentCount = studentsResult.getOrDefault(emptyList()).size,
-                    clubCount = clubs.size,
-                    presidentCount = presidentsResult.getOrDefault(emptyList()).size,
-                    eventCount = events.size,
-                    membershipCount = memberships.size,
-                    announcementCount = announcementsResult.getOrDefault(emptyList()).size,
-                    clubMemberships = membershipsByClub,
-                    eventsByMonth = eventsByMonth
-                )
+                    // Analytics 2: Events by Month
+                    val eventsByMonth = calculateEventsByMonth(events)
+
+                    _statsState.value = AdminDashboardStats(
+                        isLoading = false,
+                        studentCount = allUsers.count { it.role.lowercase() == "student" },
+                        clubCount = clubs.size,
+                        presidentCount = allUsers.count { it.role.lowercase() == "president" },
+                        eventCount = events.size,
+                        membershipCount = validMemberships.size,
+                        announcementCount = announcementsResult.getOrDefault(emptyList()).size,
+                        clubMemberships = membershipsByClub,
+                        eventsByMonth = eventsByMonth
+                    )
+                }
 
             } catch (e: Exception) {
                 _statsState.value = _statsState.value.copy(

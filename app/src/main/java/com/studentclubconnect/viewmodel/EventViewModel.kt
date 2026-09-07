@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.studentclubconnect.data.model.Event
 import com.studentclubconnect.data.repository.EventRepository
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,6 +29,7 @@ sealed class EventState {
 class EventViewModel : ViewModel() {
 
     private val repository: EventRepository = EventRepository()
+    private var eventsJob: Job? = null
 
     private val _eventState = MutableStateFlow<EventState>(EventState.Idle)
     val eventState: StateFlow<EventState> = _eventState.asStateFlow()
@@ -36,7 +38,8 @@ class EventViewModel : ViewModel() {
      * Fetches all events from the repository.
      */
     fun getEvents() {
-        viewModelScope.launch {
+        eventsJob?.cancel()
+        eventsJob = viewModelScope.launch {
             _eventState.value = EventState.Loading
             val result = repository.getAllEvents()
             result.fold(
@@ -77,24 +80,19 @@ class EventViewModel : ViewModel() {
     }
 
     /**
-     * Fetches events belonging to a specific club.
+     * Fetches events belonging to a specific club with real-time updates.
      */
     fun getEventsByClub(clubId: String) {
-        viewModelScope.launch {
+        eventsJob?.cancel()
+        eventsJob = viewModelScope.launch {
             _eventState.value = EventState.Loading
-            val result = repository.getEventsByClub(clubId)
-            result.fold(
-                onSuccess = { events ->
-                    if (events.isEmpty()) {
-                        _eventState.value = EventState.Empty
-                    } else {
-                        _eventState.value = EventState.Success(events)
-                    }
-                },
-                onFailure = { error ->
-                    _eventState.value = EventState.Error("Error: ${error.message ?: "Unable to load events for this club. Please try again."}")
+            repository.getEventsByClubFlow(clubId).collect { events ->
+                if (events.isEmpty()) {
+                    _eventState.value = EventState.Empty
+                } else {
+                    _eventState.value = EventState.Success(events)
                 }
-            )
+            }
         }
     }
 

@@ -2,6 +2,9 @@ package com.studentclubconnect.data.repository
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.studentclubconnect.data.model.User
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 class UserRepository(private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()) {
@@ -72,7 +75,6 @@ class UserRepository(private val firestore: FirebaseFirestore = FirebaseFirestor
 
     /**
      * Retrieves multiple user profiles by their UIDs.
-     * Uses direct document fetch for maximum reliability.
      */
     suspend fun getUsersByUids(uids: List<String>): Result<List<User>> {
         if (uids.isEmpty()) return Result.success(emptyList())
@@ -111,5 +113,22 @@ class UserRepository(private val firestore: FirebaseFirestore = FirebaseFirestor
             android.util.Log.e("UserRepository", "Failed to get all users", e)
             Result.failure(e)
         }
+    }
+
+    /**
+     * Retrieves all user profiles as a Flow for real-time updates.
+     */
+    fun getAllUsersFlow(): Flow<List<User>> = callbackFlow {
+        val listener = firestore.collection("users").addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                close(error)
+                return@addSnapshotListener
+            }
+            if (snapshot != null) {
+                val users = snapshot.toObjects(User::class.java)
+                trySend(users)
+            }
+        }
+        awaitClose { listener.remove() }
     }
 }

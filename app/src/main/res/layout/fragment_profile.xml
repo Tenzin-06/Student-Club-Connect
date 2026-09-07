@@ -1,468 +1,492 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_light"
-    android:fillViewport="true">
+    android:background="@color/background_light">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingHorizontal="@dimen/screen_margin"
-        android:paddingTop="@dimen/spacing_large">
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@id/btnSaveChanges"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Profile Header -->
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/ivProfilePicture"
-            android:layout_width="@dimen/profile_image_size"
-            android:layout_height="@dimen/profile_image_size"
-            android:layout_marginTop="@dimen/spacing_small"
-            android:padding="2dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_profile"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
-            app:strokeColor="@color/primary_navy"
-            app:strokeWidth="1dp" />
-
-        <TextView
-            android:id="@+id/tvProfileName"
-            style="@style/Typography.Heading"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_medium"
-            android:text="Student Name"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ivProfilePicture" />
-
-        <TextView
-            android:id="@+id/tvProfileStudentId"
-            style="@style/Typography.Body"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_tiny"
-            android:text="Student ID"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvProfileName" />
-
-        <!-- Stats Card -->
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/clStats"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_large"
-            android:background="@drawable/bg_stats_card"
-            android:padding="@dimen/spacing_medium"
-            app:layout_constraintTop_toBottomOf="@id/tvProfileStudentId">
+            android:paddingTop="@dimen/spacing_large">
 
-            <LinearLayout
-                android:id="@+id/llClubsJoined"
-                android:layout_width="0dp"
+            <TextView
+                android:id="@+id/tvProfileHeader"
+                style="@style/Typography.Heading"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/vDivider"
+                android:layout_marginStart="@dimen/screen_margin"
+                android:text="Profile"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
-                    android:id="@+id/tvClubsCount"
-                    style="@style/Typography.Heading"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textStyle="normal"
-                    android:textColor="@color/primary_navy" />
+            <!-- Profile Header -->
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivProfilePicture"
+                android:layout_width="@dimen/profile_image_size"
+                android:layout_height="@dimen/profile_image_size"
+                android:layout_marginTop="@dimen/spacing_large"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_profile_placeholder"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvProfileHeader"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full" />
 
-                <TextView
-                    style="@style/Typography.Caption"
-                    android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/tvProfileName"
+                style="@style/Typography.Heading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_medium"
+                android:text="Student Name"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/ivProfilePicture" />
+
+            <TextView
+                android:id="@+id/tvProfileStudentId"
+                style="@style/Typography.Body"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_tiny"
+                android:text="Student ID"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvProfileName" />
+
+            <!-- Stats Card -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/clStats"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/screen_margin"
+                android:layout_marginTop="@dimen/spacing_large"
+                android:background="@drawable/bg_stats_card"
+                android:padding="@dimen/spacing_medium"
+                app:layout_constraintTop_toBottomOf="@id/tvProfileStudentId">
+
+                <LinearLayout
+                    android:id="@+id/llClubsJoined"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Clubs Joined" />
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/vDivider"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                        android:id="@+id/tvClubsCount"
+                        style="@style/Typography.Heading"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textStyle="normal"
+                        android:textColor="@color/primary_navy" />
+
+                    <TextView
+                        style="@style/Typography.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Clubs Joined" />
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/vDivider"
+                    android:layout_width="1dp"
+                    android:layout_height="40dp"
+                    android:background="@color/border_light"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <LinearLayout
+                    android:id="@+id/llEventsRegistered"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/vDivider"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                        android:id="@+id/tvEventsCount"
+                        style="@style/Typography.Heading"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textStyle="normal"
+                        android:textColor="@color/primary_navy" />
+
+                    <TextView
+                        style="@style/Typography.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Events Registered" />
+                </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Information Section -->
+            <LinearLayout
+                android:id="@+id/llInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_large"
+                android:orientation="vertical"
+                android:paddingHorizontal="@dimen/screen_margin"
+                app:layout_constraintTop_toBottomOf="@id/clStats">
+
+                <!-- Name (Edit Mode Only) -->
+                <LinearLayout
+                    android:id="@+id/rowEditName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="@dimen/spacing_medium"
+                    android:visibility="gone">
+                    <TextView style="@style/Typography.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Full Name" />
+                    <EditText
+                        android:id="@+id/etProfileName"
+                        style="@style/Component.Input"
+                        android:layout_marginTop="@dimen/spacing_small"
+                        android:hint="Enter your name"
+                        android:inputType="textPersonName" />
+                </LinearLayout>
+
+                <!-- Programme -->
+                <LinearLayout android:id="@+id/rowProgramme" style="@style/ProfileInfoRow">
+                    <ImageView style="@style/ProfileInfoIcon" android:src="@drawable/ic_programme" app:tint="@color/primary_navy" />
+                    <TextView
+                        android:id="@+id/tvProfileProgramme"
+                        style="@style/Typography.SubHeading.Normal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Programme" />
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/rowEditProgramme"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="@dimen/spacing_medium"
+                    android:visibility="gone">
+                    <TextView style="@style/Typography.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Programme" />
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_small"
+                        app:hintEnabled="false">
+                        <AutoCompleteTextView
+                            android:id="@+id/actvProgramme"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Select programme"
+                            android:inputType="none" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+                <!-- Department -->
+                <LinearLayout android:id="@+id/rowDepartment" style="@style/ProfileInfoRow">
+                    <ImageView style="@style/ProfileInfoIcon" android:src="@drawable/ic_department" app:tint="@color/primary_navy" />
+                    <TextView
+                        android:id="@+id/tvProfileDepartment"
+                        style="@style/Typography.SubHeading.Normal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Department" />
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/rowEditDepartment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="@dimen/spacing_medium"
+                    android:visibility="gone">
+                    <TextView style="@style/Typography.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Department" />
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_small"
+                        app:hintEnabled="false">
+                        <AutoCompleteTextView
+                            android:id="@+id/actvDepartment"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Select department"
+                            android:inputType="none" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+                <!-- Semester -->
+                <LinearLayout android:id="@+id/rowSemester" style="@style/ProfileInfoRow">
+                    <ImageView style="@style/ProfileInfoIcon" android:src="@drawable/ic_semester" app:tint="@color/primary_navy" />
+                    <TextView
+                        android:id="@+id/tvProfileSemester"
+                        style="@style/Typography.SubHeading.Normal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Semester" />
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/rowEditSemester"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="@dimen/spacing_medium"
+                    android:visibility="gone">
+                    <TextView style="@style/Typography.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Semester" />
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_small"
+                        app:hintEnabled="false">
+                        <AutoCompleteTextView
+                            android:id="@+id/actvSemester"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Select semester"
+                            android:inputType="none" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+                <!-- Email -->
+                <LinearLayout android:id="@+id/rowEmail" style="@style/ProfileInfoRow">
+                    <ImageView style="@style/ProfileInfoIcon" android:src="@drawable/ic_email" app:tint="@color/primary_navy" />
+                    <TextView
+                        android:id="@+id/tvProfileEmail"
+                        style="@style/Typography.SubHeading.Normal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="email@example.com" />
+                </LinearLayout>
+
+                <!-- Phone -->
+                <LinearLayout android:id="@+id/rowPhone" style="@style/ProfileInfoRow">
+                    <ImageView style="@style/ProfileInfoIcon" android:src="@drawable/ic_phone" app:tint="@color/primary_navy" />
+                    <TextView
+                        android:id="@+id/tvProfilePhone"
+                        style="@style/Typography.SubHeading.Normal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Phone" />
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/rowEditPhone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="@dimen/spacing_medium"
+                    android:visibility="gone">
+                    <TextView style="@style/Typography.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Phone" />
+                    <EditText
+                        android:id="@+id/etProfilePhone"
+                        style="@style/Component.Input"
+                        android:layout_marginTop="@dimen/spacing_small"
+                        android:hint="Enter phone number"
+                        android:inputType="phone" />
+                </LinearLayout>
+
             </LinearLayout>
 
+            <!-- Actions List (View Mode) -->
+            <LinearLayout
+                android:id="@+id/llActions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/screen_margin"
+                android:layout_marginTop="@dimen/spacing_large"
+                android:background="@drawable/bg_stats_card"
+                android:orientation="vertical"
+                app:layout_constraintTop_toBottomOf="@id/llInfo">
+
+                <!-- Club Dashboard (President Only) -->
+                <LinearLayout
+                    android:id="@+id/btnMyClubDashboard"
+                    style="@style/ProfileListItem"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+                    <ImageView style="@style/ProfileInfoIcon" android:src="@drawable/ic_dashboard" app:tint="@color/primary_navy" />
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView
+                            style="@style/Typography.SubHeading.Normal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Club Dashboard" />
+                    </LinearLayout>
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron_right" />
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/dividerMyClub"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/border_light"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+                <!-- Admin Dashboard (Admin Only) -->
+                <LinearLayout
+                    android:id="@+id/btnAdminDashboard"
+                    style="@style/ProfileListItem"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+                    <ImageView style="@style/ProfileInfoIcon" android:src="@drawable/ic_dashboard" app:tint="@color/primary_navy" />
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView
+                            style="@style/Typography.SubHeading.Normal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Admin Dashboard" />
+                    </LinearLayout>
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron_right" />
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/dividerAdminDashboard"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/border_light"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+                <!-- Edit Profile -->
+                <LinearLayout
+                    android:id="@+id/btnEditProfileItem"
+                    style="@style/ProfileListItem">
+                    <ImageView style="@style/ProfileInfoIcon" android:src="@drawable/ic_edit" app:tint="@color/primary_navy" />
+                    <TextView
+                        style="@style/Typography.SubHeading.Normal"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="Edit Profile" />
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron_right" />
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border_light" />
+
+                <!-- My Clubs -->
+                <LinearLayout
+                    android:id="@+id/btnMyClubs"
+                    style="@style/ProfileListItem">
+                    <ImageView style="@style/ProfileInfoIcon" android:src="@drawable/ic_clubs" app:tint="@color/primary_navy" />
+                    <TextView
+                        style="@style/Typography.SubHeading.Normal"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="My Clubs" />
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron_right" />
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border_light" />
+
+                <!-- My Events -->
+                <LinearLayout
+                    android:id="@+id/btnMyEvents"
+                    style="@style/ProfileListItem">
+                    <ImageView style="@style/ProfileInfoIcon" android:src="@drawable/ic_events" app:tint="@color/primary_navy" />
+                    <TextView
+                        style="@style/Typography.SubHeading.Normal"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="My Events" />
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron_right" />
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border_light" />
+
+                <!-- Logout -->
+                <LinearLayout
+                    android:id="@+id/btnLogoutItem"
+                    style="@style/ProfileListItem">
+                    <ImageView style="@style/ProfileInfoIcon" android:src="@drawable/ic_logout" />
+                    <TextView
+                        style="@style/Typography.SubHeading.Normal"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="Logout"
+                        android:textColor="#E53935" />
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="#E53935" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Spacing for bottom button -->
             <View
-                android:id="@+id/vDivider"
-                android:layout_width="1dp"
-                android:layout_height="40dp"
-                android:background="@color/border_light"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/spacing_huge"
+                app:layout_constraintTop_toBottomOf="@id/llActions" />
+
+            <!-- Loading Indicator Overlay -->
+            <ProgressBar
+                android:id="@+id/pbLoading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <LinearLayout
-                android:id="@+id/llEventsRegistered"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/vDivider"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <TextView
-                    android:id="@+id/tvEventsCount"
-                    style="@style/Typography.Heading"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textStyle="normal"
-                    android:textColor="@color/primary_navy" />
-
-                <TextView
-                    style="@style/Typography.Caption"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Events Registered" />
-            </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
 
-        <!-- Information Section -->
-        <LinearLayout
-            android:id="@+id/llInfo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_large"
-            android:orientation="vertical"
-            app:layout_constraintTop_toBottomOf="@id/clStats">
+    <Button
+        android:id="@+id/btnSaveChanges"
+        style="@style/Component.Button.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/screen_margin"
+        android:text="Save Changes"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:visibility="visible" />
 
-            <!-- Name (Edit Mode Only) -->
-            <LinearLayout
-                android:id="@+id/rowEditName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginBottom="@dimen/spacing_medium"
-                android:visibility="gone">
-                <TextView style="@style/Typography.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Full Name" />
-                <EditText
-                    android:id="@+id/etProfileName"
-                    style="@style/Component.Input"
-                    android:layout_marginTop="@dimen/spacing_small"
-                    android:hint="Enter your name"
-                    android:inputType="textPersonName" />
-            </LinearLayout>
-
-            <!-- Programme -->
-            <LinearLayout android:id="@+id/rowProgramme" style="@style/ProfileInfoRow">
-                <ImageView style="@style/ProfileInfoIcon" android:src="@drawable/ic_programme" app:tint="@color/primary_navy" />
-                <TextView
-                    android:id="@+id/tvProfileProgramme"
-                    style="@style/Typography.SubHeading"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Programme" />
-            </LinearLayout>
-            <LinearLayout
-                android:id="@+id/rowEditProgramme"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginBottom="@dimen/spacing_medium"
-                android:visibility="gone">
-                <TextView style="@style/Typography.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Programme" />
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/spacing_small"
-                    app:hintEnabled="false">
-                    <AutoCompleteTextView
-                        android:id="@+id/actvProgramme"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Select programme"
-                        android:inputType="none" />
-                </com.google.android.material.textfield.TextInputLayout>
-            </LinearLayout>
-
-            <!-- Department -->
-            <LinearLayout android:id="@+id/rowDepartment" style="@style/ProfileInfoRow">
-                <ImageView style="@style/ProfileInfoIcon" android:src="@drawable/ic_department" app:tint="@color/primary_navy" />
-                <TextView
-                    android:id="@+id/tvProfileDepartment"
-                    style="@style/Typography.SubHeading"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Department" />
-            </LinearLayout>
-            <LinearLayout
-                android:id="@+id/rowEditDepartment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginBottom="@dimen/spacing_medium"
-                android:visibility="gone">
-                <TextView style="@style/Typography.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Department" />
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/spacing_small"
-                    app:hintEnabled="false">
-                    <AutoCompleteTextView
-                        android:id="@+id/actvDepartment"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Select department"
-                        android:inputType="none" />
-                </com.google.android.material.textfield.TextInputLayout>
-            </LinearLayout>
-
-            <!-- Semester -->
-            <LinearLayout android:id="@+id/rowSemester" style="@style/ProfileInfoRow">
-                <ImageView style="@style/ProfileInfoIcon" android:src="@drawable/ic_semester" app:tint="@color/primary_navy" />
-                <TextView
-                    android:id="@+id/tvProfileSemester"
-                    style="@style/Typography.SubHeading"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Semester" />
-            </LinearLayout>
-            <LinearLayout
-                android:id="@+id/rowEditSemester"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginBottom="@dimen/spacing_medium"
-                android:visibility="gone">
-                <TextView style="@style/Typography.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Semester" />
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/spacing_small"
-                    app:hintEnabled="false">
-                    <AutoCompleteTextView
-                        android:id="@+id/actvSemester"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Select semester"
-                        android:inputType="none" />
-                </com.google.android.material.textfield.TextInputLayout>
-            </LinearLayout>
-
-            <!-- Email -->
-            <LinearLayout android:id="@+id/rowEmail" style="@style/ProfileInfoRow">
-                <ImageView style="@style/ProfileInfoIcon" android:src="@drawable/ic_email" app:tint="@color/primary_navy" />
-                <TextView
-                    android:id="@+id/tvProfileEmail"
-                    style="@style/Typography.SubHeading"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="email@example.com" />
-            </LinearLayout>
-
-            <!-- Phone -->
-            <LinearLayout android:id="@+id/rowPhone" style="@style/ProfileInfoRow">
-                <ImageView style="@style/ProfileInfoIcon" android:src="@drawable/ic_phone" app:tint="@color/primary_navy" />
-                <TextView
-                    android:id="@+id/tvProfilePhone"
-                    style="@style/Typography.SubHeading"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Phone" />
-            </LinearLayout>
-            <LinearLayout
-                android:id="@+id/rowEditPhone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginBottom="@dimen/spacing_medium"
-                android:visibility="gone">
-                <TextView style="@style/Typography.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Phone" />
-                <EditText
-                    android:id="@+id/etProfilePhone"
-                    style="@style/Component.Input"
-                    android:layout_marginTop="@dimen/spacing_small"
-                    android:hint="Enter phone number"
-                    android:inputType="phone" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <!-- Actions List (View Mode) -->
-        <LinearLayout
-            android:id="@+id/llActions"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_large"
-            android:background="@drawable/bg_stats_card"
-            android:orientation="vertical"
-            app:layout_constraintTop_toBottomOf="@id/llInfo">
-
-            <!-- Club Dashboard (President Only) -->
-            <LinearLayout
-                android:id="@+id/btnMyClubDashboard"
-                style="@style/ProfileListItem"
-                android:visibility="gone"
-                tools:visibility="visible">
-                <ImageView style="@style/ProfileInfoIcon" android:src="@drawable/ic_dashboard" app:tint="@color/primary_navy" />
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-                    <TextView
-                        style="@style/Typography.SubHeading"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Club Dashboard" />
-                </LinearLayout>
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_chevron_right" />
-            </LinearLayout>
-
-            <View
-                android:id="@+id/dividerMyClub"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/border_light"
-                android:visibility="gone"
-                tools:visibility="visible" />
-
-            <!-- Admin Dashboard (Admin Only) -->
-            <LinearLayout
-                android:id="@+id/btnAdminDashboard"
-                style="@style/ProfileListItem"
-                android:visibility="gone"
-                tools:visibility="visible">
-                <ImageView style="@style/ProfileInfoIcon" android:src="@drawable/ic_dashboard" app:tint="@color/primary_navy" />
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-                    <TextView
-                        style="@style/Typography.SubHeading"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Admin Dashboard" />
-                </LinearLayout>
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_chevron_right" />
-            </LinearLayout>
-
-            <View
-                android:id="@+id/dividerAdminDashboard"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/border_light"
-                android:visibility="gone"
-                tools:visibility="visible" />
-
-            <!-- Edit Profile -->
-            <LinearLayout
-                android:id="@+id/btnEditProfileItem"
-                style="@style/ProfileListItem">
-                <ImageView style="@style/ProfileInfoIcon" android:src="@drawable/ic_edit" app:tint="@color/primary_navy" />
-                <TextView
-                    style="@style/Typography.SubHeading"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="Edit Profile" />
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_chevron_right" />
-            </LinearLayout>
-
-            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border_light" />
-
-            <!-- My Clubs -->
-            <LinearLayout
-                android:id="@+id/btnMyClubs"
-                style="@style/ProfileListItem">
-                <ImageView style="@style/ProfileInfoIcon" android:src="@drawable/ic_clubs" app:tint="@color/primary_navy" />
-                <TextView
-                    style="@style/Typography.SubHeading"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="My Clubs" />
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_chevron_right" />
-            </LinearLayout>
-
-            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border_light" />
-
-            <!-- My Events -->
-            <LinearLayout
-                android:id="@+id/btnMyEvents"
-                style="@style/ProfileListItem">
-                <ImageView style="@style/ProfileInfoIcon" android:src="@drawable/ic_events" app:tint="@color/primary_navy" />
-                <TextView
-                    style="@style/Typography.SubHeading"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="My Events" />
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_chevron_right" />
-            </LinearLayout>
-
-            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border_light" />
-
-            <!-- Logout -->
-            <LinearLayout
-                android:id="@+id/btnLogoutItem"
-                style="@style/ProfileListItem">
-                <ImageView style="@style/ProfileInfoIcon" android:src="@drawable/ic_logout" />
-                <TextView
-                    style="@style/Typography.SubHeading"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="Logout"
-                    android:textColor="#E53935" />
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_chevron_right"
-                    app:tint="#E53935" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <!-- Save Changes Button (Only in Edit Mode) -->
-        <Button
-            android:id="@+id/btnSaveChanges"
-            style="@style/Component.Button.Primary"
-            android:layout_marginTop="@dimen/spacing_huge"
-            android:text="Save Changes"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/llInfo" />
-
-        <!-- Loading Indicator Overlay -->
-        <ProgressBar
-            android:id="@+id/pbLoading"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.core.widget.NestedScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

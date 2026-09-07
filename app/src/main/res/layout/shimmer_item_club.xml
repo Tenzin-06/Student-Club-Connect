@@ -15,13 +15,14 @@
         android:layout_height="wrap_content"
         android:padding="@dimen/spacing_medium">
 
-        <View
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/shimmerIcon"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="@color/chip_background"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full" />
 
         <View
             android:id="@+id/shimmerTitle"

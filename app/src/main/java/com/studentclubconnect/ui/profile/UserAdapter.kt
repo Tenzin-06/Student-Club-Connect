@@ -6,6 +6,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
 import com.studentclubconnect.R
 import com.studentclubconnect.data.model.User
 import com.studentclubconnect.databinding.ItemUserBinding
@@ -50,6 +51,12 @@ class UserAdapter : ListAdapter<User, UserAdapter.UserViewHolder>(UserDiffCallba
                     else -> root.context.getColor(R.color.text_secondary)
                 }
                 tvUserRoleBadge.backgroundTintList = android.content.res.ColorStateList.valueOf(badgeColor)
+
+                ivUserIcon.load(user.profileImage) {
+                    crossfade(true)
+                    placeholder(R.drawable.ic_profile_placeholder)
+                    error(R.drawable.ic_profile_placeholder)
+                }
 
                 if (role == "president" && !user.presidentOf.isNullOrEmpty()) {
                     val clubName = clubNames[user.presidentOf] ?: "Loading club..."

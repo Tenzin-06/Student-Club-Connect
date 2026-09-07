@@ -44,7 +44,7 @@
                     android:id="@+id/ivClubIcon"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:src="@drawable/ic_dashboard"
+                    android:src="@drawable/ic_clubs"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:tint="@color/primary_navy" />
@@ -208,7 +208,7 @@
                 style="@style/ProfileListItem">
                 <ImageView style="@style/ProfileInfoIcon" android:src="@drawable/ic_members" app:tint="@color/primary_navy" />
                 <TextView
-                    style="@style/Typography.SubHeading"
+                    style="@style/Typography.SubHeading.Normal"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
@@ -227,7 +227,7 @@
                 style="@style/ProfileListItem">
                 <ImageView style="@style/ProfileInfoIcon" android:src="@drawable/ic_events" app:tint="@color/primary_navy" />
                 <TextView
-                    style="@style/Typography.SubHeading"
+                    style="@style/Typography.SubHeading.Normal"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
@@ -246,7 +246,7 @@
                 style="@style/ProfileListItem">
                 <ImageView style="@style/ProfileInfoIcon" android:src="@drawable/ic_announcement" app:tint="@color/primary_navy" />
                 <TextView
-                    style="@style/Typography.SubHeading"
+                    style="@style/Typography.SubHeading.Normal"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
@@ -265,7 +265,7 @@
                 style="@style/ProfileListItem">
                 <ImageView style="@style/ProfileInfoIcon" android:src="@drawable/ic_edit" app:tint="@color/primary_navy" />
                 <TextView
-                    style="@style/Typography.SubHeading"
+                    style="@style/Typography.SubHeading.Normal"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"

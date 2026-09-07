@@ -41,8 +41,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_marginEnd="8dp"
-            android:ellipsize="end"
-            android:maxLines="1"
             android:textSize="14sp"
             app:layout_constraintEnd_toStartOf="@id/tvAnnouncementTime"
             app:layout_constraintStart_toEndOf="@id/cardIcon"
@@ -70,7 +68,7 @@
             android:textColor="@color/text_secondary"
             android:textSize="10sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tvAnnouncementTitle"
+            app:layout_constraintTop_toTopOf="@id/cardIcon"
             tools:text="Posted 2 hours ago" />
 
         <TextView
@@ -78,12 +76,11 @@
             style="@style/Typography.Body"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:ellipsize="end"
-            android:maxLines="2"
+            android:layout_marginTop="12dp"
+            android:lineSpacingExtra="4dp"
             android:textSize="13sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@id/tvAnnouncementTitle"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvAnnouncementClub"
             tools:text="Submit your best nature shots by this Friday for a chance to win!" />
 
@@ -91,7 +88,7 @@
             android:id="@+id/layoutManagement"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="12dp"
             android:gravity="end"
             android:orientation="horizontal"
             android:visibility="gone"

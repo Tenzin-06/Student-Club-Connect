@@ -1,5 +1,6 @@
 package com.studentclubconnect.ui.clubs
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -9,7 +10,12 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.tabs.TabLayout
 import com.studentclubconnect.databinding.ActivityClubDetailsBinding
+import coil.load
+import com.studentclubconnect.ui.events.EventAdapter
+import com.studentclubconnect.ui.events.EventDetailsActivity
 import com.studentclubconnect.viewmodel.AuthViewModel
 import com.studentclubconnect.viewmodel.ClubState
 import com.studentclubconnect.viewmodel.ClubViewModel
@@ -17,6 +23,8 @@ import com.studentclubconnect.viewmodel.MembershipState
 import com.studentclubconnect.viewmodel.MembershipViewModel
 import com.studentclubconnect.viewmodel.AnnouncementState
 import com.studentclubconnect.viewmodel.AnnouncementViewModel
+import com.studentclubconnect.viewmodel.EventState
+import com.studentclubconnect.viewmodel.EventViewModel
 import kotlinx.coroutines.launch
 
 class ClubDetailsActivity : AppCompatActivity() {
@@ -26,9 +34,13 @@ class ClubDetailsActivity : AppCompatActivity() {
     private val membershipViewModel: MembershipViewModel by viewModels()
     private val authViewModel: AuthViewModel by viewModels()
     private val announcementViewModel: AnnouncementViewModel by viewModels()
+    private val eventViewModel: EventViewModel by viewModels()
 
     private lateinit var announcementAdapter: AnnouncementAdapter
+    private lateinit var eventAdapter: EventAdapter
+    
     private var isMember = false
+    private var currentClubId: String? = null
     private var currentClub: com.studentclubconnect.data.model.Club? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,44 +48,47 @@ class ClubDetailsActivity : AppCompatActivity() {
         binding = ActivityClubDetailsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val clubId = intent.getStringExtra("clubId")
-        if (clubId.isNullOrEmpty()) {
+        currentClubId = intent.getStringExtra("clubId")
+        if (currentClubId.isNullOrEmpty()) {
             Toast.makeText(this, "Unable to load club details.", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
         setupToolbar()
-        setupAnnouncements()
-        observeViewModels(clubId)
+        setupTabs()
+        setupAdapters()
+        observeViewModels(currentClubId!!)
 
         binding.btnJoinClub.setOnClickListener {
             if (isMember) {
-                membershipViewModel.leaveClub(clubId)
+                membershipViewModel.leaveClub(currentClubId!!)
             } else {
-                membershipViewModel.joinClub(clubId)
+                membershipViewModel.joinClub(currentClubId!!)
             }
         }
 
         binding.btnEditClub.setOnClickListener {
-            val intent = android.content.Intent(this, AddEditClubActivity::class.java).apply {
-                putExtra("clubId", clubId)
+            val intent = Intent(this, AddEditClubActivity::class.java).apply {
+                putExtra("clubId", currentClubId)
             }
             startActivity(intent)
         }
 
         binding.btnDeleteClub.setOnClickListener {
-            showDeleteConfirmation(clubId)
+            showDeleteConfirmation(currentClubId!!)
         }
     }
 
     override fun onStart() {
         super.onStart()
-        val clubId = intent.getStringExtra("clubId") ?: return
-        viewModel.getClubById(clubId)
-        membershipViewModel.checkMembership(clubId)
-        announcementViewModel.getAnnouncementsByClub(clubId)
-        authViewModel.getCurrentUser()?.uid?.let { authViewModel.loadUserProfile(it) }
+        currentClubId?.let { id ->
+            viewModel.getClubById(id)
+            membershipViewModel.checkMembership(id)
+            announcementViewModel.getAnnouncementsByClub(id)
+            eventViewModel.getEventsByClub(id)
+            authViewModel.getCurrentUser()?.uid?.let { authViewModel.loadUserProfile(it) }
+        }
     }
 
     private fun setupToolbar() {
@@ -82,14 +97,38 @@ class ClubDetailsActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupAnnouncements() {
-        val user = authViewModel.userProfile.value
+    private fun setupTabs() {
+        binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                when (tab?.position) {
+                    0 -> showSection(about = true)
+                    1 -> showSection(events = true)
+                    2 -> showSection(announcements = true)
+                    3 -> showSection(manage = true)
+                }
+            }
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+        })
+    }
+
+    private fun showSection(
+        about: Boolean = false,
+        events: Boolean = false,
+        announcements: Boolean = false,
+        manage: Boolean = false
+    ) {
+        binding.layoutAbout.isVisible = about
+        binding.layoutEvents.isVisible = events
+        binding.layoutAnnouncements.isVisible = announcements
+        binding.adminActionContainer.isVisible = manage
+    }
+
+    private fun setupAdapters() {
+        // Announcements
         announcementAdapter = AnnouncementAdapter(
-            currentUserId = user?.uid,
-            currentUserRole = user?.role,
-            userPresidentOf = user?.presidentOf,
             onEditClick = { announcement ->
-                val intent = android.content.Intent(this, AddEditAnnouncementActivity::class.java).apply {
+                val intent = Intent(this, AddEditAnnouncementActivity::class.java).apply {
                     putExtra("announcementId", announcement.id)
                     putExtra("clubId", announcement.clubId)
                     putExtra("title", announcement.title)
@@ -103,7 +142,19 @@ class ClubDetailsActivity : AppCompatActivity() {
         )
         binding.rvAnnouncements.apply {
             adapter = announcementAdapter
-            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this@ClubDetailsActivity)
+            layoutManager = LinearLayoutManager(this@ClubDetailsActivity)
+        }
+
+        // Events
+        eventAdapter = EventAdapter(showFooter = true) { event ->
+            val intent = Intent(this, EventDetailsActivity::class.java).apply {
+                putExtra("eventId", event.id)
+            }
+            startActivity(intent)
+        }
+        binding.rvEvents.apply {
+            adapter = eventAdapter
+            layoutManager = LinearLayoutManager(this@ClubDetailsActivity)
         }
     }
 
@@ -132,7 +183,6 @@ class ClubDetailsActivity : AppCompatActivity() {
                             currentClub = state.club
                             state.club?.let { 
                                 displayClub(it)
-                                // Provide club name to announcement adapter
                                 announcementAdapter.setClubNames(mapOf(it.id to it.name))
                             } ?: run {
                                 Toast.makeText(this@ClubDetailsActivity, "Club not found.", Toast.LENGTH_SHORT).show()
@@ -154,16 +204,32 @@ class ClubDetailsActivity : AppCompatActivity() {
             }
         }
 
-        // Observe User Role for Admin Actions
+        // Observe User Role for Manage Tab Visibility
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 authViewModel.userProfile.collect { user ->
                     val isAdmin = user?.role?.lowercase() == "admin"
                     val isPresident = user?.role?.lowercase() == "president" && user.presidentOf == clubId
-                    binding.adminActionContainer.isVisible = isAdmin || isPresident
+                    val hasManageAccess = isAdmin || isPresident
                     
-                    // Refresh announcements adapter with new user info
-                    setupAnnouncements()
+                    // Show/Hide Manage Tab
+                    val manageTab = binding.tabLayout.getTabAt(3)
+                    if (hasManageAccess) {
+                        if (manageTab == null) {
+                            binding.tabLayout.addTab(binding.tabLayout.newTab().setText(com.studentclubconnect.R.string.manage))
+                        }
+                    } else {
+                        if (manageTab != null) {
+                            binding.tabLayout.removeTabAt(3)
+                        }
+                    }
+                    
+                    // Update announcement adapter with new user context
+                    announcementAdapter.updateUserContext(
+                        uid = user?.uid,
+                        role = user?.role,
+                        presidentOf = user?.presidentOf
+                    )
                 }
             }
         }
@@ -191,9 +257,27 @@ class ClubDetailsActivity : AppCompatActivity() {
                             binding.btnJoinClub.isEnabled = true
                             Toast.makeText(this@ClubDetailsActivity, state.message, Toast.LENGTH_SHORT).show()
                         }
-                        is MembershipState.AuthExpired -> {
-                            Toast.makeText(this@ClubDetailsActivity, "Authentication expired. Please log in again.", Toast.LENGTH_LONG).show()
-                            // In a real app, redirect to login
+                        else -> {}
+                    }
+                }
+            }
+        }
+
+        // Observe Events
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                eventViewModel.eventState.collect { state ->
+                    when (state) {
+                        is EventState.Success -> {
+                            binding.tvNoEvents.isVisible = false
+                            eventAdapter.submitList(state.events)
+                        }
+                        is EventState.Empty -> {
+                            binding.tvNoEvents.isVisible = true
+                            eventAdapter.submitList(emptyList())
+                        }
+                        is EventState.Error -> {
+                            Toast.makeText(this@ClubDetailsActivity, state.message, Toast.LENGTH_SHORT).show()
                         }
                         else -> {}
                     }
@@ -233,6 +317,8 @@ class ClubDetailsActivity : AppCompatActivity() {
 
     private fun updateJoinButtonUI(member: Boolean) {
         binding.btnJoinClub.text = if (member) "Leave Club" else "Join Club"
+        // Also update member count when joining/leaving
+        currentClubId?.let { viewModel.getClubById(it) }
     }
 
     private fun showDeleteConfirmation(clubId: String) {
@@ -252,9 +338,13 @@ class ClubDetailsActivity : AppCompatActivity() {
             tvClubCategory.text = club.category.ifEmpty { "General" }
             tvClubDescription.text = club.description.ifEmpty { "No description available." }
             tvPresidentName.text = club.president.ifEmpty { "No President assigned" }
+            tvMemberCount.text = getString(com.studentclubconnect.R.string.members_count, club.memberCount)
             
-            // Image loading would go here (e.g. Glide.with(this).load(club.imageUrl)...)
-            // For now it uses the placeholder in XML
+            ivClubImage.load(club.imageUrl) {
+                crossfade(true)
+                placeholder(com.studentclubconnect.R.drawable.ic_clubs)
+                error(com.studentclubconnect.R.drawable.ic_clubs)
+            }
         }
     }
 }

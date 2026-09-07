@@ -53,7 +53,7 @@ class HomeViewModel : ViewModel() {
                 // 2. Fetch Upcoming Events
                 val eventsResult = eventRepository.getAllEvents()
                 val allEvents = eventsResult.getOrDefault(emptyList())
-                val upcomingEvents = allEvents.take(5)
+                val upcomingEvents = allEvents.take(3)
 
                 // 3. Fetch Joined Clubs
                 val membershipsResult = membershipRepository.getMembershipsByUser(userId)
@@ -85,7 +85,7 @@ class HomeViewModel : ViewModel() {
                 val announcementsResult = announcementRepository.getAllAnnouncements()
                 val announcements = announcementsResult.getOrDefault(emptyList())
                     .sortedByDescending { it.createdAt }
-                    .take(5)
+                    .take(3)
 
                 // 6. Resolve Club Names
                 val clubNames = allClubs.associate { it.id to it.name }

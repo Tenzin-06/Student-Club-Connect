@@ -3,6 +3,9 @@ package com.studentclubconnect.data.repository
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.studentclubconnect.data.model.Announcement
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 /**
@@ -90,5 +93,23 @@ class AnnouncementRepository(private val firestore: FirebaseFirestore = Firebase
             Log.e("AnnouncementRepository", "Error deleting announcement: $id", e)
             Result.failure(e)
         }
+    }
+
+    /**
+     * Retrieves announcements belonging to a specific club as a Flow for real-time updates.
+     */
+    fun getAnnouncementsByClubFlow(clubId: String): Flow<List<Announcement>> = callbackFlow {
+        val listener = announcementsCollection
+            .whereEqualTo("clubId", clubId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                if (snapshot != null) {
+                    trySend(snapshot.toObjects(Announcement::class.java))
+                }
+            }
+        awaitClose { listener.remove() }
     }
 }
