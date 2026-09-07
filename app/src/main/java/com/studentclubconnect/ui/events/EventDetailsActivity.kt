@@ -9,7 +9,9 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.studentclubconnect.R
 import com.studentclubconnect.databinding.ActivityEventDetailsBinding
+import coil.load
 import com.studentclubconnect.viewmodel.AuthViewModel
 import com.studentclubconnect.viewmodel.ClubState
 import com.studentclubconnect.viewmodel.ClubViewModel
@@ -150,7 +152,8 @@ class EventDetailsActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 clubViewModel.clubState.collect { state ->
                     if (state is ClubState.SingleSuccess) {
-                        binding.tvClubName.text = state.club?.name ?: "Unknown Club"
+                        val clubName = state.club?.name ?: "Unknown Club"
+                        binding.tvClubName.text = getString(R.string.organized_by, clubName)
                     }
                 }
             }
@@ -279,7 +282,11 @@ class EventDetailsActivity : AppCompatActivity() {
             tvEventLocation.text = event.location
             tvEventDescription.text = event.description
             
-            // In a real app, use Glide/Coil for event.imageUrl
+            ivEventImage.load(event.imageUrl) {
+                crossfade(true)
+                placeholder(R.drawable.ic_events)
+                error(R.drawable.ic_events)
+            }
         }
     }
 }

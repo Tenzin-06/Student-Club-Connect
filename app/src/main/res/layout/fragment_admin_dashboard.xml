@@ -68,7 +68,7 @@
                         android:textColor="@color/primary_navy"
                         tools:text="342" />
                     <TextView
-                        style="@style/Typography.Label"
+                        style="@style/Typography.SubHeading.Normal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Students" />
@@ -102,7 +102,7 @@
                         android:textColor="@color/primary_navy"
                         tools:text="18" />
                     <TextView
-                        style="@style/Typography.Label"
+                        style="@style/Typography.SubHeading.Normal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Clubs" />
@@ -136,7 +136,7 @@
                         android:textColor="@color/primary_navy"
                         tools:text="18" />
                     <TextView
-                        style="@style/Typography.Label"
+                        style="@style/Typography.SubHeading.Normal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Presidents" />
@@ -170,7 +170,7 @@
                         android:textColor="@color/primary_navy"
                         tools:text="47" />
                     <TextView
-                        style="@style/Typography.Label"
+                        style="@style/Typography.SubHeading.Normal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Events" />
@@ -204,7 +204,7 @@
                         android:textColor="@color/primary_navy"
                         tools:text="728" />
                     <TextView
-                        style="@style/Typography.Label"
+                        style="@style/Typography.SubHeading.Normal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Memberships" />
@@ -238,7 +238,7 @@
                         android:textColor="@color/primary_navy"
                         tools:text="124" />
                     <TextView
-                        style="@style/Typography.Label"
+                        style="@style/Typography.SubHeading.Normal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Announcements" />
@@ -347,7 +347,7 @@
                     android:layout_weight="1"
                     android:orientation="vertical">
                     <TextView
-                        style="@style/Typography.SubHeading"
+                        style="@style/Typography.SubHeading.Normal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Clubs" />
@@ -378,7 +378,7 @@
                     android:layout_weight="1"
                     android:orientation="vertical">
                     <TextView
-                        style="@style/Typography.SubHeading"
+                        style="@style/Typography.SubHeading.Normal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Events" />
@@ -409,7 +409,7 @@
                     android:layout_weight="1"
                     android:orientation="vertical">
                     <TextView
-                        style="@style/Typography.SubHeading"
+                        style="@style/Typography.SubHeading.Normal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Announcements" />
@@ -440,7 +440,7 @@
                     android:layout_weight="1"
                     android:orientation="vertical">
                     <TextView
-                        style="@style/Typography.SubHeading"
+                        style="@style/Typography.SubHeading.Normal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Users" />

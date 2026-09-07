@@ -20,6 +20,7 @@ import com.studentclubconnect.viewmodel.ClubState
 import com.studentclubconnect.viewmodel.ClubViewModel
 import com.studentclubconnect.viewmodel.EventState
 import com.studentclubconnect.viewmodel.EventViewModel
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -142,49 +143,48 @@ class AddEditEventActivity : AppCompatActivity() {
             }
         }
 
-        // Observe Clubs for Dropdown
+        // Observe Clubs and User Profile together for Dropdown
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // Wait for user profile to know the role
-                authViewModel.userProfile.collect { user ->
-                    val userRole = user?.role?.lowercase()
-                    val presidentOf = user?.presidentOf
+                combine(authViewModel.userProfile, clubViewModel.clubState) { user, state ->
+                    user to state
+                }.collect { (user, state) ->
+                    if (state is ClubState.Success) {
+                        val userRole = user?.role?.lowercase()
+                        val presidentOf = user?.presidentOf
 
-                    clubViewModel.clubState.collect { state ->
-                        if (state is ClubState.Success) {
-                            // Filter clubs based on role
-                            clubsList = when (userRole) {
-                                "president" -> state.clubs.filter { it.id == presidentOf }
-                                "admin" -> state.clubs
-                                else -> emptyList()
-                            }
-                            
-                            // Disable club selection for presidents
-                            if (userRole == "president") {
-                                binding.tilClub.isEnabled = false
-                                binding.actvClub.isEnabled = false
-                            } else {
-                                binding.tilClub.isEnabled = true
-                                binding.actvClub.isEnabled = true
-                            }
+                        // Filter clubs based on role
+                        clubsList = when (userRole) {
+                            "president" -> state.clubs.filter { it.id == presidentOf }
+                            "admin" -> state.clubs
+                            else -> emptyList()
+                        }
+                        
+                        // Disable club selection for presidents
+                        if (userRole == "president") {
+                            binding.tilClub.isEnabled = false
+                            binding.actvClub.isEnabled = false
+                        } else {
+                            binding.tilClub.isEnabled = true
+                            binding.actvClub.isEnabled = true
+                        }
 
-                            val clubNames = clubsList.map { it.name }
-                            val adapter = ArrayAdapter(this@AddEditEventActivity, android.R.layout.simple_dropdown_item_1line, clubNames)
-                            binding.actvClub.setAdapter(adapter)
-                            
-                            binding.actvClub.setOnItemClickListener { _, _, position, _ ->
-                                selectedClubId = clubsList[position].id
-                            }
-                            
-                            // If editing or if only one club available (president), auto-set
-                            if (isEditMode && selectedClubId.isNotEmpty()) {
-                                val selectedClub = clubsList.find { it.id == selectedClubId }
-                                selectedClub?.let { binding.actvClub.setText(it.name, false) }
-                            } else if (userRole == "president" && clubsList.size == 1) {
-                                val club = clubsList[0]
-                                binding.actvClub.setText(club.name, false)
-                                selectedClubId = club.id
-                            }
+                        val clubNames = clubsList.map { it.name }
+                        val adapter = ArrayAdapter(this@AddEditEventActivity, android.R.layout.simple_dropdown_item_1line, clubNames)
+                        binding.actvClub.setAdapter(adapter)
+                        
+                        binding.actvClub.setOnItemClickListener { _, _, position, _ ->
+                            selectedClubId = clubsList[position].id
+                        }
+                        
+                        // If editing or if only one club available (president), auto-set
+                        if (isEditMode && selectedClubId.isNotEmpty()) {
+                            val selectedClub = clubsList.find { it.id == selectedClubId }
+                            selectedClub?.let { binding.actvClub.setText(it.name, false) }
+                        } else if (userRole == "president" && clubsList.size == 1) {
+                            val club = clubsList[0]
+                            binding.actvClub.setText(club.name, false)
+                            selectedClubId = club.id
                         }
                     }
                 }

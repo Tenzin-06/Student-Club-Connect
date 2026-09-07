@@ -5,10 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.studentclubconnect.data.model.Club
 import com.studentclubconnect.data.model.User
 import com.studentclubconnect.data.repository.ClubRepository
+import com.studentclubconnect.data.repository.MembershipRepository
 import com.studentclubconnect.data.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 /**
@@ -32,31 +34,44 @@ class ClubViewModel : ViewModel() {
 
     private val repository: ClubRepository = ClubRepository()
     private val userRepository: UserRepository = UserRepository()
+    private val membershipRepository: MembershipRepository = MembershipRepository()
     
     private val _clubState = MutableStateFlow<ClubState>(ClubState.Idle)
     val clubState: StateFlow<ClubState> = _clubState.asStateFlow()
 
     /**
-     * Fetches all clubs from the repository.
+     * Fetches all clubs from the repository with real-time member counts.
      */
     fun getClubs() {
         viewModelScope.launch {
             _clubState.value = ClubState.Loading
-            val result = repository.getAllClubs()
-            result.fold(
-                onSuccess = { clubs ->
-                    if (clubs.isEmpty()) {
-                        _clubState.value = ClubState.Empty
-                    } else {
-                        _clubState.value = ClubState.Success(clubs)
+            
+            combine(
+                repository.getAllClubsFlow(),
+                membershipRepository.getAllMembershipsFlow(),
+                userRepository.getAllUsersFlow()
+            ) { clubs, memberships, allUsers ->
+                DataPack(clubs, memberships, allUsers)
+            }.collect { pack ->
+                if (pack.clubs.isEmpty()) {
+                    _clubState.value = ClubState.Empty
+                } else {
+                    val validUserIds = pack.users.map { it.uid }.toSet()
+                    val enrichedClubs = pack.clubs.map { club ->
+                        val memberCount = pack.memberships.count { it.clubId == club.id && validUserIds.contains(it.userId) }
+                        club.copy(memberCount = memberCount)
                     }
-                },
-                onFailure = { error ->
-                    _clubState.value = ClubState.Error("Error: ${error.message ?: "Unable to load clubs. Please try again."}") 
+                    _clubState.value = ClubState.Success(enrichedClubs)
                 }
-            )
+            }
         }
     }
+
+    private data class DataPack(
+        val clubs: List<Club>,
+        val memberships: List<com.studentclubconnect.data.model.Membership>,
+        val users: List<User>
+    )
 
     /**
      * Fetches a single club by its ID.
@@ -64,19 +79,32 @@ class ClubViewModel : ViewModel() {
     fun getClubById(id: String) {
         viewModelScope.launch {
             _clubState.value = ClubState.Loading
-            val result = repository.getClubById(id)
-            result.fold(
-                onSuccess = { club ->
-                    if (club == null) {
-                        _clubState.value = ClubState.Error("Club not found.")
-                    } else {
-                        _clubState.value = ClubState.SingleSuccess(club)
+            
+            combine(
+                userRepository.getAllUsersFlow(),
+                membershipRepository.getMembershipsByClubFlow(id)
+            ) { allUsers, clubMemberships ->
+                allUsers to clubMemberships
+            }.collect { pair ->
+                val allUsers = pair.first
+                val clubMemberships = pair.second
+                
+                val clubResult = repository.getClubById(id)
+                clubResult.fold(
+                    onSuccess = { club ->
+                        if (club == null) {
+                            _clubState.value = ClubState.Error("Club not found.")
+                        } else {
+                            val validUserIds = allUsers.map { it.uid }.toSet()
+                            val activeMemberCount = clubMemberships.count { validUserIds.contains(it.userId) }
+                            _clubState.value = ClubState.SingleSuccess(club.copy(memberCount = activeMemberCount))
+                        }
+                    },
+                    onFailure = { 
+                        _clubState.value = ClubState.Error("Unable to load club. Please try again.") 
                     }
-                },
-                onFailure = { 
-                    _clubState.value = ClubState.Error("Unable to load club. Please try again.") 
-                }
-            )
+                )
+            }
         }
     }
 

@@ -2,6 +2,9 @@ package com.studentclubconnect.data.repository
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.studentclubconnect.data.model.Membership
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 class MembershipRepository(private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()) {
@@ -43,18 +46,12 @@ class MembershipRepository(private val firestore: FirebaseFirestore = FirebaseFi
     }
 
     /**
-     * Removes a user from a club by marking status as inactive or deleting the document.
-     * Requirement 7: "Remove/deactivate membership". Marking inactive allows re-joining easily.
+     * Removes a user from a club.
      */
     suspend fun leaveClub(userId: String, clubId: String): Result<Unit> {
         return try {
             val docId = "${userId}_${clubId}"
-            // Option A: Delete the document
             membershipsCollection.document(docId).delete().await()
-            
-            // Option B: Mark as inactive
-            // membershipsCollection.document(docId).update("status", "inactive").await()
-            
             Result.success(Unit)
         } catch (e: Exception) {
             android.util.Log.e("MembershipRepository", "Error leaving club", e)
@@ -129,5 +126,42 @@ class MembershipRepository(private val firestore: FirebaseFirestore = FirebaseFi
             android.util.Log.e("MembershipRepository", "Error getting club members count", e)
             Result.failure(e)
         }
+    }
+
+    /**
+     * Retrieves all active memberships across all clubs as a Flow for real-time updates.
+     */
+    fun getAllMembershipsFlow(): Flow<List<Membership>> = callbackFlow {
+        val listener = membershipsCollection
+            .whereEqualTo("status", "active")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                if (snapshot != null) {
+                    trySend(snapshot.toObjects(Membership::class.java))
+                }
+            }
+        awaitClose { listener.remove() }
+    }
+
+    /**
+     * Retrieves all active memberships for a specific club as a Flow.
+     */
+    fun getMembershipsByClubFlow(clubId: String): Flow<List<Membership>> = callbackFlow {
+        val listener = membershipsCollection
+            .whereEqualTo("clubId", clubId)
+            .whereEqualTo("status", "active")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                if (snapshot != null) {
+                    trySend(snapshot.toObjects(Membership::class.java))
+                }
+            }
+        awaitClose { listener.remove() }
     }
 }

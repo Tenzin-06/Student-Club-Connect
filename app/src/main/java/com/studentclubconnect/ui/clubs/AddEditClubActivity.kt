@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
@@ -50,12 +51,28 @@ class AddEditClubActivity : AppCompatActivity() {
         if (isEditMode) {
             binding.toolbar.title = "Edit Club"
             binding.btnSubmit.text = "Save Changes"
+            binding.btnDeleteClub.isVisible = true
             clubId?.let { viewModel.getClubById(it) }
         }
 
         binding.btnSubmit.setOnClickListener {
             validateAndSubmit()
         }
+
+        binding.btnDeleteClub.setOnClickListener {
+            showDeleteConfirmation()
+        }
+    }
+
+    private fun showDeleteConfirmation() {
+        AlertDialog.Builder(this)
+            .setTitle("Delete Club")
+            .setMessage("Are you sure you want to delete this club? This action cannot be undone.")
+            .setPositiveButton("Delete") { _, _ ->
+                clubId?.let { viewModel.deleteClub(it) }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun setupToolbar() {

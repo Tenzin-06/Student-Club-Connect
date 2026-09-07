@@ -6,6 +6,8 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import com.studentclubconnect.R
 import com.studentclubconnect.data.model.User
 import com.studentclubconnect.databinding.ItemMemberBinding
 
@@ -37,6 +39,12 @@ class MemberAdapter(
                 
                 // Don't allow president to remove themselves
                 btnRemove.isVisible = user.uid != currentPresidentId
+                
+                ivMemberIcon.load(user.profileImage) {
+                    crossfade(true)
+                    placeholder(R.drawable.ic_profile_placeholder)
+                    error(R.drawable.ic_profile_placeholder)
+                }
                 
                 btnRemove.setOnClickListener { onRemoveClick(user) }
             }

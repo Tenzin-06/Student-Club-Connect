@@ -27,19 +27,13 @@ class ManageUsersViewModel : ViewModel() {
     fun loadUsers() {
         viewModelScope.launch {
             _usersState.value = ManageUsersState.Loading
-            val result = repository.getAllUsers()
-            result.fold(
-                onSuccess = { users ->
-                    if (users.isEmpty()) {
-                        _usersState.value = ManageUsersState.Empty
-                    } else {
-                        _usersState.value = ManageUsersState.Success(users)
-                    }
-                },
-                onFailure = { error ->
-                    _usersState.value = ManageUsersState.Error(error.message ?: "Failed to load users")
+            repository.getAllUsersFlow().collect { users ->
+                if (users.isEmpty()) {
+                    _usersState.value = ManageUsersState.Empty
+                } else {
+                    _usersState.value = ManageUsersState.Success(users)
                 }
-            )
+            }
         }
     }
 }

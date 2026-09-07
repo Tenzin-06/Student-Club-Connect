@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
@@ -48,6 +49,7 @@ class AddEditAnnouncementActivity : AppCompatActivity() {
         if (isEditMode) {
             binding.toolbar.title = "Edit Announcement"
             binding.btnSubmit.text = "Save Changes"
+            binding.btnDeleteAnnouncement.isVisible = true
             
             // Populate fields from extras
             binding.etTitle.setText(intent.getStringExtra("title"))
@@ -58,6 +60,21 @@ class AddEditAnnouncementActivity : AppCompatActivity() {
         binding.btnSubmit.setOnClickListener {
             validateAndSubmit()
         }
+
+        binding.btnDeleteAnnouncement.setOnClickListener {
+            showDeleteConfirmation()
+        }
+    }
+
+    private fun showDeleteConfirmation() {
+        AlertDialog.Builder(this)
+            .setTitle("Delete Announcement")
+            .setMessage("Are you sure you want to delete this announcement? This action cannot be undone.")
+            .setPositiveButton("Delete") { _, _ ->
+                announcementId?.let { announcementViewModel.deleteAnnouncement(it) }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun setupToolbar() {

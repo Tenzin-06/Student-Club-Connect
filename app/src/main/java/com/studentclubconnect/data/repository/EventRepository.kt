@@ -3,6 +3,9 @@ package com.studentclubconnect.data.repository
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.studentclubconnect.data.model.Event
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 /**
@@ -14,7 +17,6 @@ class EventRepository(private val firestore: FirebaseFirestore = FirebaseFiresto
 
     /**
      * Creates a new event in Firestore.
-     * Generates a unique document ID and stores it in the 'id' field.
      */
     suspend fun createEvent(event: Event): Result<String> {
         return try {
@@ -105,5 +107,23 @@ class EventRepository(private val firestore: FirebaseFirestore = FirebaseFiresto
             Log.e("EventRepository", "Error deleting event: $id", e)
             Result.failure(e)
         }
+    }
+
+    /**
+     * Retrieves events belonging to a specific club as a Flow for real-time updates.
+     */
+    fun getEventsByClubFlow(clubId: String): Flow<List<Event>> = callbackFlow {
+        val listener = eventsCollection
+            .whereEqualTo("clubId", clubId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                if (snapshot != null) {
+                    trySend(snapshot.toObjects(Event::class.java))
+                }
+            }
+        awaitClose { listener.remove() }
     }
 }

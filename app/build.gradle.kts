@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.material)
     implementation("com.facebook.shimmer:shimmer:0.5.0")
+    implementation("io.coil-kt:coil:2.7.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)

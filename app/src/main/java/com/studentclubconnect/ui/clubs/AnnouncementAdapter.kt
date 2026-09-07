@@ -14,9 +14,9 @@ import com.studentclubconnect.utils.TimeUtils
  * Adapter for displaying announcements in a list.
  */
 class AnnouncementAdapter(
-    private val currentUserId: String? = null,
-    private val currentUserRole: String? = null,
-    private val userPresidentOf: String? = null,
+    private var currentUserId: String? = null,
+    private var currentUserRole: String? = null,
+    private var userPresidentOf: String? = null,
     private val onEditClick: ((Announcement) -> Unit)? = null,
     private val onDeleteClick: ((Announcement) -> Unit)? = null
 ) : ListAdapter<Announcement, AnnouncementAdapter.AnnouncementViewHolder>(AnnouncementDiffCallback()) {
@@ -25,6 +25,13 @@ class AnnouncementAdapter(
 
     fun setClubNames(names: Map<String, String>) {
         clubNames = names
+        notifyDataSetChanged()
+    }
+
+    fun updateUserContext(uid: String?, role: String?, presidentOf: String?) {
+        this.currentUserId = uid
+        this.currentUserRole = role
+        this.userPresidentOf = presidentOf
         notifyDataSetChanged()
     }
 
