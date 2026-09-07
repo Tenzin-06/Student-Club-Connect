@@ -2,6 +2,7 @@ package com.studentclubconnect.ui.events
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -14,6 +15,7 @@ import java.util.Locale
  * Adapter for displaying the list of events using ListAdapter and DiffUtil.
  */
 class EventAdapter(
+    private val showFooter: Boolean = true,
     private val onEventClick: (Event) -> Unit
 ) : ListAdapter<Event, EventAdapter.EventViewHolder>(EventDiffCallback()) {
 
@@ -40,6 +42,9 @@ class EventAdapter(
                 tvEventTime.text = "${event.date}, ${event.time}"
                 tvEventLocation.text = event.location
                 
+                // Hide footer for home screen if requested
+                footerGroup.isVisible = showFooter
+
                 // Parse date for badge
                 try {
                     val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())

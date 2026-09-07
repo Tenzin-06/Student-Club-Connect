@@ -60,8 +60,8 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupRecyclerViews() {
-        // Upcoming Events
-        eventAdapter = EventAdapter { event ->
+        // Upcoming Events - Hide footer
+        eventAdapter = EventAdapter(showFooter = false) { event ->
             val intent = Intent(requireContext(), EventDetailsActivity::class.java).apply {
                 putExtra("eventId", event.id)
             }
@@ -72,8 +72,8 @@ class HomeFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
         }
 
-        // My Clubs
-        clubAdapter = ClubAdapter { club ->
+        // My Clubs - Hide footer
+        clubAdapter = ClubAdapter(showFooter = false) { club ->
             val intent = Intent(requireContext(), ClubDetailsActivity::class.java).apply {
                 putExtra("clubId", club.id)
             }
@@ -84,8 +84,8 @@ class HomeFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
         }
 
-        // Popular Clubs
-        popularClubAdapter = ClubAdapter { club ->
+        // Popular Clubs - Hide footer
+        popularClubAdapter = ClubAdapter(showFooter = false) { club ->
             val intent = Intent(requireContext(), ClubDetailsActivity::class.java).apply {
                 putExtra("clubId", club.id)
             }
@@ -130,20 +130,13 @@ class HomeFragment : Fragment() {
                 viewModel.homeState.collect { state ->
                     when (state) {
                         is HomeState.Loading -> {
-                            binding.shimmerView.isVisible = true
-                            binding.shimmerView.startShimmer()
-                            binding.rvRecentAnnouncements.isVisible = false
-                            binding.rvUpcomingEvents.isVisible = false
-                            binding.rvMyClubs.isVisible = false
-                            binding.rvPopularClubs.isVisible = false
-                            
+                            showLoading(true)
                             binding.cardNoAnnouncements.isVisible = false
                             binding.cardNoEvents.isVisible = false
                             binding.cardNoClubs.isVisible = false
                         }
                         is HomeState.Success -> {
-                            binding.shimmerView.stopShimmer()
-                            binding.shimmerView.isVisible = false
+                            showLoading(false)
                             
                             // Welcome Message
                             val userName = state.user?.name ?: "Student"
@@ -191,13 +184,36 @@ class HomeFragment : Fragment() {
                             }
                         }
                         is HomeState.Error -> {
-                            binding.shimmerView.stopShimmer()
-                            binding.shimmerView.isVisible = false
+                            showLoading(false)
                             Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
             }
+        }
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        binding.shimmerPopularClubs.isVisible = isLoading
+        binding.shimmerUpcomingEvents.isVisible = isLoading
+        binding.shimmerAnnouncements.isVisible = isLoading
+        binding.shimmerMyClubs.isVisible = isLoading
+        
+        if (isLoading) {
+            binding.shimmerPopularClubs.startShimmer()
+            binding.shimmerUpcomingEvents.startShimmer()
+            binding.shimmerAnnouncements.startShimmer()
+            binding.shimmerMyClubs.startShimmer()
+            
+            binding.rvPopularClubs.isVisible = false
+            binding.rvUpcomingEvents.isVisible = false
+            binding.rvRecentAnnouncements.isVisible = false
+            binding.rvMyClubs.isVisible = false
+        } else {
+            binding.shimmerPopularClubs.stopShimmer()
+            binding.shimmerUpcomingEvents.stopShimmer()
+            binding.shimmerAnnouncements.stopShimmer()
+            binding.shimmerMyClubs.stopShimmer()
         }
     }
 

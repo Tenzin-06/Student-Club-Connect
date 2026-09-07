@@ -6,58 +6,96 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/screen_margin"
-    android:layout_marginVertical="@dimen/spacing_small">
+    android:layout_marginVertical="@dimen/spacing_small"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:padding="@dimen/spacing_medium">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardIcon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:cardBackgroundColor="@color/background_light"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="10dp"
+                android:src="@drawable/ic_announcement"
+                app:tint="@color/primary_navy" />
+        </com.google.android.material.card.MaterialCardView>
 
         <TextView
             android:id="@+id/tvAnnouncementTitle"
             style="@style/Typography.SubHeading"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:drawablePadding="@dimen/spacing_small"
-            app:drawableStartCompat="@drawable/ic_announcement"
-            app:drawableTint="@color/primary_navy"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toStartOf="@id/tvAnnouncementTime"
+            app:layout_constraintStart_toEndOf="@id/cardIcon"
+            app:layout_constraintTop_toTopOf="@id/cardIcon"
             tools:text="Photography Competition" />
 
         <TextView
             android:id="@+id/tvAnnouncementClub"
             style="@style/Typography.Caption"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_tiny"
+            android:layout_marginTop="2dp"
             android:textColor="@color/primary_navy"
             android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@id/tvAnnouncementTitle"
+            app:layout_constraintStart_toStartOf="@id/tvAnnouncementTitle"
+            app:layout_constraintTop_toBottomOf="@id/tvAnnouncementTitle"
             tools:text="Photography Club" />
-
-        <TextView
-            android:id="@+id/tvAnnouncementMessage"
-            style="@style/Typography.Body"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_tiny"
-            tools:text="Submit your best nature shots by this Friday for a chance to win!" />
 
         <TextView
             android:id="@+id/tvAnnouncementTime"
             style="@style/Typography.Caption"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_small"
+            android:textColor="@color/text_secondary"
+            android:textSize="10sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tvAnnouncementTitle"
             tools:text="Posted 2 hours ago" />
+
+        <TextView
+            android:id="@+id/tvAnnouncementMessage"
+            style="@style/Typography.Body"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textSize="13sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/tvAnnouncementTitle"
+            app:layout_constraintTop_toBottomOf="@id/tvAnnouncementClub"
+            tools:text="Submit your best nature shots by this Friday for a chance to win!" />
 
         <LinearLayout
             android:id="@+id/layoutManagement"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_small"
+            android:layout_marginTop="8dp"
             android:gravity="end"
             android:orientation="horizontal"
             android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/tvAnnouncementMessage"
             tools:visibility="visible">
 
             <Button
@@ -84,6 +122,6 @@
 
         </LinearLayout>
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>

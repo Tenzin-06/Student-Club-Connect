@@ -135,6 +135,7 @@
             app:layout_constraintTop_toBottomOf="@id/divider" />
 
         <ImageView
+            android:id="@+id/ivViewDetailsArrow"
             android:layout_width="@dimen/icon_size_small"
             android:layout_height="@dimen/icon_size_small"
             android:src="@drawable/ic_chevron_right"
@@ -142,6 +143,13 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/tvViewDetails"
             app:tint="@color/primary_navy" />
+
+        <!-- Footer group that can be hidden on Home -->
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/footerGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="divider,tvViewDetails,ivViewDetailsArrow" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

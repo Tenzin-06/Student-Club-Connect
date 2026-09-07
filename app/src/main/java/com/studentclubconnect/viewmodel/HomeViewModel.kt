@@ -11,6 +11,8 @@ import com.studentclubconnect.data.repository.ClubRepository
 import com.studentclubconnect.data.repository.EventRepository
 import com.studentclubconnect.data.repository.MembershipRepository
 import com.studentclubconnect.data.repository.UserRepository
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -57,16 +59,27 @@ class HomeViewModel : ViewModel() {
                 val membershipsResult = membershipRepository.getMembershipsByUser(userId)
                 val joinedClubIds = membershipsResult.getOrDefault(emptyList()).map { it.clubId }
                 
-                val joinedClubs = mutableListOf<Club>()
-                for (clubId in joinedClubIds) {
-                    clubRepository.getClubById(clubId).onSuccess { club ->
-                        club?.let { joinedClubs.add(it) }
+                val joinedClubsDeferred = joinedClubIds.map { clubId ->
+                    async {
+                        clubRepository.getClubById(clubId).getOrNull()?.let { club ->
+                            val memberCount = membershipRepository.getMembersCountByClub(club.id).getOrDefault(0)
+                            club.copy(memberCount = memberCount)
+                        }
                     }
                 }
+                val joinedClubs = joinedClubsDeferred.awaitAll().filterNotNull()
 
-                // 4. Fetch Popular Clubs (using all clubs for now)
+                // 4. Fetch Popular Clubs
                 val popularClubsResult = clubRepository.getAllClubs()
-                val popularClubs = popularClubsResult.getOrDefault(emptyList()).take(3)
+                val allClubs = popularClubsResult.getOrDefault(emptyList())
+                
+                val popularClubsDeferred = allClubs.take(3).map { club ->
+                    async {
+                        val memberCount = membershipRepository.getMembersCountByClub(club.id).getOrDefault(0)
+                        club.copy(memberCount = memberCount)
+                    }
+                }
+                val popularClubs = popularClubsDeferred.awaitAll()
 
                 // 5. Fetch Recent Announcements
                 val announcementsResult = announcementRepository.getAllAnnouncements()
@@ -74,10 +87,8 @@ class HomeViewModel : ViewModel() {
                     .sortedByDescending { it.createdAt }
                     .take(5)
 
-                // 6. Resolve Club Names for Announcements and Events if needed
-                // For efficiency, fetch all clubs and create a map
-                val allClubsResult = clubRepository.getAllClubs()
-                val clubNames = allClubsResult.getOrDefault(emptyList()).associate { it.id to it.name }
+                // 6. Resolve Club Names
+                val clubNames = allClubs.associate { it.id to it.name }
 
                 _homeState.value = HomeState.Success(
                     user = user,
