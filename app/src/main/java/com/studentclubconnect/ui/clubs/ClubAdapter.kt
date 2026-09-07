@@ -2,6 +2,7 @@ package com.studentclubconnect.ui.clubs
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -12,6 +13,7 @@ import com.studentclubconnect.databinding.ItemClubBinding
  * Adapter for displaying the list of clubs using ListAdapter and DiffUtil.
  */
 class ClubAdapter(
+    private val showFooter: Boolean = true,
     private val onClubClick: (Club) -> Unit
 ) : ListAdapter<Club, ClubAdapter.ClubViewHolder>(ClubDiffCallback()) {
 
@@ -38,11 +40,16 @@ class ClubAdapter(
                 tvClubCategory.text = club.category
                 tvClubDescription.text = club.description
                 
-                // Set up click listener for the entire card or the "View Club" action
+                // Bind member count if available (assuming it comes from the model now)
+                tvMemberCount.text = "${club.memberCount} Members"
+                
+                // Hide footer for home screen if requested
+                footerGroup.isVisible = showFooter
+                
+                // Set up click listener for the entire card
                 root.setOnClickListener { onClubClick(club) }
                 
                 // In a real app, we would use Glide or Coil to load club.imageUrl into ivClubIcon
-                // For now, we use the default placeholder from XML
             }
         }
     }

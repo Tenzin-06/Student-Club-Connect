@@ -11,5 +11,6 @@ data class Club(
     val category: String = "",
     val president: String = "",
     val presidentId: String = "",
-    val imageUrl: String = ""
+    val imageUrl: String = "",
+    val memberCount: Int = 0
 )

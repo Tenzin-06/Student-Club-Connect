@@ -6,7 +6,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/screen_margin"
-    android:layout_marginVertical="@dimen/spacing_small">
+    android:layout_marginVertical="@dimen/spacing_small"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -41,6 +44,7 @@
             android:layout_marginEnd="@dimen/spacing_small"
             android:ellipsize="end"
             android:maxLines="1"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/cardIcon"
             app:layout_constraintTop_toTopOf="@id/cardIcon"
@@ -60,6 +64,18 @@
             tools:text="Arts" />
 
         <TextView
+            android:id="@+id/tvMemberCount"
+            style="@style/Typography.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textColor="@color/primary_navy"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@id/tvClubName"
+            app:layout_constraintTop_toBottomOf="@id/tvClubCategory"
+            tools:text="142 Members" />
+
+        <TextView
             android:id="@+id/tvClubDescription"
             style="@style/Typography.Body"
             android:layout_width="0dp"
@@ -69,7 +85,7 @@
             android:maxLines="2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@id/cardIcon"
-            app:layout_constraintTop_toBottomOf="@id/cardIcon"
+            app:layout_constraintTop_toBottomOf="@id/tvMemberCount"
             tools:text="Discover world cinema and discuss the latest releases with fellow enthusiasts." />
 
         <View
@@ -88,10 +104,12 @@
             android:layout_marginTop="@dimen/spacing_medium"
             android:text="View Club"
             android:textColor="@color/primary_navy"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/divider" />
 
         <ImageView
+            android:id="@+id/ivViewClubArrow"
             android:layout_width="@dimen/icon_size_small"
             android:layout_height="@dimen/icon_size_small"
             android:src="@drawable/ic_chevron_right"
@@ -99,6 +117,13 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/tvViewClub"
             app:tint="@color/primary_navy" />
+
+        <!-- Footer group that can be hidden on Home -->
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/footerGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="divider,tvViewClub,ivViewClubArrow" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
